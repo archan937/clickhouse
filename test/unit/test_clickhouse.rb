@@ -24,6 +24,25 @@ module Unit
         end
       end
 
+      describe ".configurations" do
+        it "returns its instance variable :@configurations" do
+          Clickhouse.instance_variable_set :@configurations, (configurations = mock)
+          assert_equal configurations, Clickhouse.configurations
+        end
+      end
+
+      describe ".configurations=" do
+        it "stores the passed hash as the instance variable :@configurations" do
+          Clickhouse.configurations = (configurations = {})
+          assert_equal configurations, Clickhouse.instance_variable_get(:@configurations)
+        end
+
+        it "stringifies the passed hash" do
+          Clickhouse.configurations = (configurations = {:a => "b"})
+          assert_equal({"a" => "b"}, Clickhouse.instance_variable_get(:@configurations))
+        end
+      end
+
     end
 
   end
