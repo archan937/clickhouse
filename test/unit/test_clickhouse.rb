@@ -43,6 +43,48 @@ module Unit
         end
       end
 
+      describe ".establish_connection" do
+        describe "when valid" do
+          before do
+            @connection = mock
+            @connection.expects(:ping!)
+          end
+
+          it "accepts configuration hashes" do
+            config = {"host" => "localhost"}
+            Clickhouse::Connection.expects(:new).with(config).returns(@connection)
+            Clickhouse.establish_connection config
+          end
+
+          it "accepts configuration names" do
+            config = {"host" => "localhost"}
+            Clickhouse.instance_variable_set(:@configurations, {"foo" => config})
+            Clickhouse::Connection.expects(:new).with(config).returns(@connection)
+            Clickhouse.establish_connection "foo"
+          end
+        end
+
+        describe "when invalid" do
+          it "denies non-configuration arguments" do
+            assert_raises Clickhouse::InvalidConnectionError do
+              Clickhouse.establish_connection 123
+            end
+            assert_raises Clickhouse::InvalidConnectionError do
+              Clickhouse.establish_connection true
+            end
+            assert_raises Clickhouse::InvalidConnectionError do
+              Clickhouse.establish_connection "foo"
+            end
+          end
+        end
+      end
+
+      describe ".connection" do
+        it "returns its instance variable :@connection" do
+          Clickhouse.instance_variable_set :@connection, (connection = mock)
+          assert_equal connection, Clickhouse.connection
+        end
+      end
     end
 
   end

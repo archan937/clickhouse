@@ -1,3 +1,6 @@
+require "faraday"
+
+require "clickhouse/connection"
 require "clickhouse/error"
 require "clickhouse/version"
 
@@ -16,7 +19,21 @@ module Clickhouse
   end
 
   def self.configurations
-    @configurations
+    @configurations ||= {}
+  end
+
+  def self.establish_connection(arg)
+    config = arg.is_a?(Hash) ? arg : (configurations || {})[arg.to_s]
+    if config
+      @connection = Connection.new(config)
+      @connection.ping!
+    else
+      raise InvalidConnectionError, "Invalid connection specified: #{arg.inspect}"
+    end
+  end
+
+  def self.connection
+    @connection
   end
 
 end

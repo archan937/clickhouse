@@ -10,3 +10,5 @@ end
 
 require "bundler"
 Bundler.require :default, :development, :test
+
+require_relative "test_helper/minitest"
