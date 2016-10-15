@@ -56,6 +56,22 @@ module Unit
             assert_equal false, @connection.connected?
           end
         end
+
+        describe "#get" do
+          it "gets delegated to the client" do
+            @connection.instance_variable_set :@client, (client = mock)
+            client.expects(:get).with(:foo)
+            @connection.get(:foo)
+          end
+        end
+
+        describe "#post" do
+          it "gets delegated to the client" do
+            @connection.instance_variable_set :@client, (client = mock)
+            client.expects(:post).with(:foo)
+            @connection.post(:foo)
+          end
+        end
       end
 
     end
