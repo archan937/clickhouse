@@ -31,7 +31,7 @@ module Unit
         end
 
         it "stringifies the passed hash" do
-          Clickhouse.configurations = (configurations = {:a => "b"})
+          Clickhouse.configurations = {:a => "b"}
           assert_equal({"a" => "b"}, Clickhouse.instance_variable_get(:@configurations))
         end
       end
