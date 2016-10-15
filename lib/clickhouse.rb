@@ -1,3 +1,4 @@
+require "clickhouse/error"
 require "clickhouse/version"
 
 module Clickhouse
