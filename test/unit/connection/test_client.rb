@@ -13,12 +13,12 @@ module Unit
           @connection = Connection.new
         end
 
-        describe "#ping!" do
+        describe "#connect!" do
           describe "when failed to connect" do
             it "returns true" do
               Faraday::Connection.any_instance.expects(:get).raises(Faraday::ConnectionFailed.new("Failed to connect"))
               assert_raises Clickhouse::ConnectionError do
-                @connection.ping!
+                @connection.connect!
               end
             end
           end
@@ -26,7 +26,7 @@ module Unit
           describe "when receiving 200" do
             it "returns true" do
               Faraday::Connection.any_instance.expects(:get).returns(stub({:status => 200}))
-              assert_equal true, @connection.ping!
+              assert_equal true, @connection.connect!
             end
           end
 
@@ -34,9 +34,26 @@ module Unit
             it "raises a Clickhouse::ConnectionError" do
               Faraday::Connection.any_instance.expects(:get).returns(stub({:status => 500}))
               assert_raises Clickhouse::ConnectionError do
-                @connection.ping!
+                @connection.connect!
               end
             end
+          end
+
+          describe "when already connected" do
+            it "returns nil" do
+              @connection.instance_variable_set :@client, mock
+              assert_nil @connection.connect!
+            end
+          end
+        end
+
+        describe "#connected?" do
+          it "returns whether it has an connected socket" do
+            assert_equal false, @connection.connected?
+            @connection.instance_variable_set :@client, mock
+            assert_equal true, @connection.connected?
+            @connection.instance_variable_set :@client, nil
+            assert_equal false, @connection.connected?
           end
         end
       end

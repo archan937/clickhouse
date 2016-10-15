@@ -11,7 +11,7 @@ module Clickhouse
   end
 
   def self.logger
-    @logger
+    @logger if instance_variables.include?(:@logger)
   end
 
   def self.configurations=(configurations)
@@ -19,21 +19,21 @@ module Clickhouse
   end
 
   def self.configurations
-    @configurations ||= {}
+    @configurations if instance_variables.include?(:@configurations)
   end
 
   def self.establish_connection(arg)
     config = arg.is_a?(Hash) ? arg : (configurations || {})[arg.to_s]
     if config
       @connection = Connection.new(config)
-      @connection.ping!
+      @connection.connect!
     else
       raise InvalidConnectionError, "Invalid connection specified: #{arg.inspect}"
     end
   end
 
   def self.connection
-    @connection
+    @connection if instance_variables.include?(:@connection)
   end
 
 end

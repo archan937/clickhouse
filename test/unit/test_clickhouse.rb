@@ -47,7 +47,7 @@ module Unit
         describe "when valid" do
           before do
             @connection = mock
-            @connection.expects(:ping!)
+            @connection.expects(:connect!)
           end
 
           it "accepts configuration hashes" do
