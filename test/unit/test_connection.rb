@@ -8,6 +8,12 @@ module Unit
         @connection = Clickhouse::Connection.new
       end
 
+      describe "included modules" do
+        it "includes all Clickhouse::Connection modules" do
+          assert_equal true, @connection.class.included_modules.include?(Clickhouse::Connection::Client)
+        end
+      end
+
       describe "#initialize" do
         describe "when not passing a configuration" do
           it "uses a default configuration" do

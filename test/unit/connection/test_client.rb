@@ -4,9 +4,13 @@ module Unit
   module Connection
     class TestClient < MiniTest::Test
 
+      class Connection < SimpleConnection
+        include Clickhouse::Connection::Client
+      end
+
       describe Clickhouse::Connection::Client do
         before do
-          @connection = Clickhouse::Connection.new
+          @connection = Connection.new
         end
 
         describe "#ping!" do
