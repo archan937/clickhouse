@@ -11,6 +11,7 @@ module Unit
       describe "included modules" do
         it "includes all Clickhouse::Connection modules" do
           assert_equal true, @connection.class.included_modules.include?(Clickhouse::Connection::Client)
+          assert_equal true, @connection.class.included_modules.include?(Clickhouse::Connection::Logger)
         end
       end
 

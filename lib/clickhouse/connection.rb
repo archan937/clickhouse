@@ -1,9 +1,11 @@
 require "clickhouse/connection/client"
+require "clickhouse/connection/logger"
 
 module Clickhouse
   class Connection
 
     include Client
+    include Logger
 
     def initialize(config = {})
       @config = {
