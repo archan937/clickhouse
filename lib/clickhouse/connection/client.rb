@@ -18,7 +18,7 @@ module Clickhouse
       end
 
       def get(query)
-        request(:get, query)
+        request(:get, query).body
       end
 
       def post(query, body = nil)
@@ -37,12 +37,9 @@ module Clickhouse
 
       def request(method, query, body = nil)
         connect!
-
-        query = query.to_s.gsub(/(;|\bFORMAT \w+)/i, "")
-        params = {:query => "#{query} FORMAT TabSeparatedWithNamesAndTypes"}
+        query = query.to_s.strip
         start = Time.now
-
-        client.send(method, "/", params, body).body.tap do
+        client.send(method, "/?query=#{CGI.escape(query)}", body).tap do
           log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
         end
       end

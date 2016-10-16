@@ -60,8 +60,7 @@ module Unit
         describe "#get" do
           it "sends a GET request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            params = {:query => "foo FORMAT TabSeparatedWithNamesAndTypes"}
-            client.expects(:get).with("/", params, nil).returns(stub(:body => ""))
+            client.expects(:get).with("/?query=foo", nil).returns(stub(:body => ""))
             @connection.stubs(:log)
             @connection.get(:foo)
           end
@@ -70,8 +69,7 @@ module Unit
         describe "#post" do
           it "sends a POST request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            params = {:query => "foo FORMAT TabSeparatedWithNamesAndTypes"}
-            client.expects(:post).with("/", params, "body").returns(stub(:body => ""))
+            client.expects(:post).with("/?query=foo", "body").returns(stub(:body => ""))
             @connection.stubs(:log)
             @connection.post(:foo, "body")
           end
@@ -89,11 +87,10 @@ module Unit
             @connection.send :request, :get, "/", "query"
           end
 
-          it "queries the server requesting a TabSeparatedWithNamesAndTypes formatted response" do
+          it "queries the server returning the response" do
             @connection.instance_variable_set :@client, (client = mock)
-            params = {:query => "#{query = "SELECT 1"} FORMAT TabSeparatedWithNamesAndTypes"}
-            client.expects(:get).with("/", params, nil).returns(stub(:body => ""))
-            @connection.send :request, :get, query
+            client.expects(:get).with("/?query=SELECT+1", nil).returns(response = mock)
+            assert_equal response, @connection.send(:request, :get, "SELECT 1")
           end
         end
       end

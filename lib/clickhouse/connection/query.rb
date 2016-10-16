@@ -5,7 +5,13 @@ module Clickhouse
   class Connection
     module Query
 
+      def execute(query, body = nil)
+        post(query, body)
+      end
+
       def query(query)
+        query = query.to_s.gsub(/(;|\bFORMAT \w+)/i, "").strip
+        query += " FORMAT TabSeparatedWithNamesAndTypes"
         parse_response get(query)
       end
 
