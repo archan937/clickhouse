@@ -142,6 +142,38 @@ module Unit
             end
           end
 
+          describe "#to_hashes" do
+            it "returns an array containing the rows as hashes" do
+              assert_equal [
+                {
+                  "SUM(clicks)" => 1072649,
+                  "AVG(price)" => 142.94,
+                  "domain" => "badrequest.io",
+                  "id" => "d91d1c90",
+                  "date" => Date.new(2016, 3, 20),
+                  "MAX(time)" => Time.new(2016, 3, 20, 23, 49, 11),
+                  "groupUniqArray(code)" => [4, 2, 5, 7]
+                }, {
+                  "SUM(clicks)" => 12948140,
+                  "AVG(price)" => 9320.11,
+                  "domain" => "engel.pm",
+                  "id" => "d91d217c",
+                  "date" => Date.new(2016, 3, 20),
+                  "MAX(time)" => Time.new(2016, 3, 20, 23, 58, 34),
+                  "groupUniqArray(code)" => [6, 2, 9, 8, 1]
+                }, {
+                  "SUM(clicks)" => 319384,
+                  "AVG(price)" => 101.02,
+                  "domain" => "archan937.com",
+                  "id" => "d91d2294",
+                  "date" => Date.new(2016, 3, 20),
+                  "MAX(time)" => Time.new(2016, 3, 20, 22, 55, 39),
+                  "groupUniqArray(code)" => [3, 1, 2]
+                }
+              ], @result_set.to_hashes
+            end
+          end
+
           describe "memoization" do
             it "memoizes the parsed rows" do
               assert_equal @result_set.to_a[-1].object_id, @result_set.each{}[-1].object_id

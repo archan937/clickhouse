@@ -18,7 +18,7 @@ module Clickhouse
       end
 
       def get(query)
-        request(:get, query).body
+        request(:get, query)
       end
 
       def post(query, body = nil)

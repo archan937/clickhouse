@@ -28,6 +28,125 @@ module Unit
           end
         end
 
+        describe "#query" do
+          it "sends a GET request requesting a TSV response including names and types" do
+            @connection.expects(:get).with("sql FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            assert_equal [], @connection.query("sql").to_a
+          end
+        end
+
+        describe "#databases" do
+          it "sends a 'SHOW DATABASES' query" do
+            @connection.expects(:get).with("SHOW DATABASES FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.databases
+          end
+        end
+
+        describe "#tables" do
+          it "sends a 'SHOW TABLES' query" do
+            @connection.expects(:get).with("SHOW TABLES FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.tables
+          end
+        end
+
+        describe "#create_table" do
+          it "sends a 'CREATE TABLE' query" do
+            sql = <<-SQL
+CREATE TABLE logs_test (
+  UInt8          id,
+  Float32        price,
+  String         name,
+  Date           date,
+  DateTime       time,
+  FixedString(8) hex_id
+)
+ENGINE = MergeTree(date, 8192)
+            SQL
+            @connection.expects(:post).with(sql.strip, nil).returns(stub(:status => 200, :body => ""))
+            @connection.create_table("logs_test") do |t|
+              t.uint8        :id
+              t.float32      :price
+              t.string       :name
+              t.date         :date
+              t.date_time    :time
+              t.fixed_string :hex_id, 8
+              t.engine       "MergeTree(date, 8192)"
+            end
+          end
+        end
+
+        describe "#describe_table" do
+          it "sends a 'DESCRIBE TABLE <name>' query" do
+            @connection.expects(:get).with("DESCRIBE TABLE logs FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.describe_table("logs")
+          end
+        end
+
+        describe "#rename_table" do
+          describe "when passing an array with an even number of names" do
+            it "sends a POST request containing a RENAME TABLE statement" do
+              @connection.expects(:post).with("RENAME TABLE foo TO bar, baz TO qux", nil).returns(stub(:status => 200, :body => "")).twice
+              assert_equal true, @connection.rename_table("foo", "bar", "baz", "qux")
+              assert_equal true, @connection.rename_table(["foo", "bar"], ["baz", "qux"])
+            end
+          end
+
+          describe "when passing an array with an odd number of names" do
+            it "raises an Clickhouse::InvalidQueryError" do
+              assert_raises Clickhouse::InvalidQueryError do
+                @connection.rename_table "foo"
+              end
+              assert_raises Clickhouse::InvalidQueryError do
+                @connection.rename_table ["foo"]
+              end
+            end
+          end
+
+          describe "when passing a hash" do
+            it "sends a POST request containing a RENAME TABLE statement" do
+              @connection.expects(:post).with("RENAME TABLE foo TO bar, baz TO qux", nil).returns(stub(:status => 200, :body => ""))
+              assert_equal true, @connection.rename_table(:foo => "bar", :baz => "qux")
+            end
+          end
+        end
+
+        describe "#drop_table" do
+          it "sends a POST request containing a 'DROP TABLE' statement" do
+            @connection.expects(:post).with("DROP TABLE logs", nil).returns(stub(:status => 200, :body => ""))
+            assert_equal true, @connection.drop_table("logs")
+          end
+        end
+
+        describe "#insert_rows" do
+          before do
+            @csv = <<-CSV
+id,first_name,last_name
+12345,Paul,Engel
+67890,Bruce,Wayne
+            CSV
+          end
+
+          describe "when using hashes" do
+            it "sends a POST request containing a 'INSERT INTO' statement using CSV" do
+              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns(stub(:status => 200, :body => ""))
+              assert_equal true, @connection.insert_rows("logs") { |rows|
+                rows << {:id => 12345, :first_name => "Paul", :last_name => "Engel"}
+                rows << {:id => 67890, :first_name => "Bruce", :last_name => "Wayne"}
+              }
+            end
+          end
+
+          describe "when using arrays" do
+            it "sends a POST request containing a 'INSERT INTO' statement using CSV" do
+              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns(stub(:status => 200, :body => ""))
+              assert_equal true, @connection.insert_rows("logs", :names => %w(id first_name last_name)) { |rows|
+                rows << [12345, "Paul", "Engel"]
+                rows << [67890, "Bruce", "Wayne"]
+              }
+            end
+          end
+        end
+
         describe "#select_rows" do
           it "sends a GET request and parses the result set" do
             body = <<-TSV
@@ -38,7 +157,7 @@ module Unit
             TSV
 
             @connection.expects(:to_select_query).with(options = {:from => "logs"})
-            @connection.expects(:get).returns(body.gsub(/^\s+/, ""))
+            @connection.expects(:get).returns(stub(:body => body.gsub(/^\s+/, "")))
             assert_equal [
               [1982, "Paul"],
               [1947, "Anna"]
@@ -57,7 +176,7 @@ module Unit
           describe "when empty result set" do
             it "returns an empty array" do
               @connection.expects(:to_select_query)
-              @connection.expects(:get).returns("")
+              @connection.expects(:get).returns(stub(:body => ""))
               assert_equal [], @connection.select_values({})
             end
           end
@@ -72,7 +191,7 @@ module Unit
               TSV
 
               @connection.expects(:to_select_query)
-              @connection.expects(:get).returns(body.gsub(/^\s+/, ""))
+              @connection.expects(:get).returns(stub(:body => body.gsub(/^\s+/, "")))
               assert_equal [
                 1982,
                 1947

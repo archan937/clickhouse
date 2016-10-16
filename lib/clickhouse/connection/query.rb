@@ -1,3 +1,4 @@
+require "clickhouse/connection/query/table"
 require "clickhouse/connection/query/result_set"
 require "clickhouse/connection/query/result_row"
 
@@ -13,7 +14,42 @@ module Clickhouse
       def query(query)
         query = query.to_s.gsub(/(;|\bFORMAT \w+)/i, "").strip
         query += " FORMAT TabSeparatedWithNamesAndTypes"
-        parse_response get(query)
+        parse_response get(query).body.to_s
+      end
+
+      def databases
+        query("SHOW DATABASES").flatten
+      end
+
+      def tables
+        query("SHOW TABLES").flatten
+      end
+
+      def create_table(name, &block)
+        execute(Clickhouse::Connection::Query::Table.new(name, &block).to_sql)
+      end
+
+      def describe_table(name)
+        query("DESCRIBE TABLE #{name}").to_a
+      end
+
+      def rename_table(*args)
+        names = (args[0].is_a?(Hash) ? args[0].to_a : [args]).flatten
+        raise Clickhouse::InvalidQueryError, "Odd number of table names" unless (names.size % 2) == 0
+        names = Hash[*names].collect{|(from, to)| "#{from} TO #{to}"}
+        execute "RENAME TABLE #{names.join(", ")}"
+      end
+
+      def drop_table(name)
+        execute "DROP TABLE #{name}"
+      end
+
+      def insert_rows(table, options = {})
+        options[:csv] ||= begin
+          options[:rows] ||= yield([])
+          generate_csv options[:rows], options[:names]
+        end
+        execute "INSERT INTO #{table} FORMAT CSVWithNames", options[:csv]
       end
 
       def select_rows(options)
@@ -34,6 +70,19 @@ module Clickhouse
       end
 
     private
+
+      def generate_csv(rows, names = nil)
+        if hashes = rows[0].is_a?(Hash)
+          names ||= rows[0].keys
+        end
+
+        CSV.generate do |csv|
+          csv << names if names
+          rows.each do |row|
+            csv << (hashes ? row.values_at(*names) : row)
+          end
+        end
+      end
 
       def inspect_value(value)
         value.nil? ? "NULL" : value.inspect.gsub(/(^"|"$)/, "'").gsub("\\\"", "\"")
@@ -94,7 +143,7 @@ module Clickhouse
       end
 
       def parse_response(response)
-        rows = CSV.parse response.to_s, :col_sep => "\t"
+        rows = CSV.parse response, :col_sep => "\t"
         names = rows.shift
         types = rows.shift
         ResultSet.new rows, names, types

@@ -12,6 +12,11 @@ Run the following command to install `Clickhouse`:
 
 For support, remarks and requests, please mail me at [pm_engel@icloud.com](mailto:pm_engel@icloud.com).
 
+### TODO
+
+* Write documentation
+* Support authentication
+
 ## License
 
 Copyright (c) 2016 Paul Engel, released under the MIT license

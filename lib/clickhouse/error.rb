@@ -9,6 +9,9 @@ module Clickhouse
   class ConnectionError < Error
   end
 
+  class InvalidQueryError < Error
+  end
+
   class QueryError < Error
   end
 

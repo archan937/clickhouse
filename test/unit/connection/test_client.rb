@@ -96,7 +96,7 @@ module Unit
           describe "when not receiving status 200" do
             it "raises a Clickhouse::QueryError" do
               @connection.instance_variable_set :@client, (client = mock)
-              client.expects(:get).with("/?query=SELECT+1", nil).returns(response = stub(:status => 500, :body => ""))
+              client.expects(:get).with("/?query=SELECT+1", nil).returns(stub(:status => 500, :body => ""))
               assert_raises Clickhouse::QueryError do
                 @connection.send(:request, :get, "SELECT 1")
               end

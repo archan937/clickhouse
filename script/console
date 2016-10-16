@@ -9,5 +9,17 @@ def connect!(config = {})
   Clickhouse.establish_connection(config)
 end
 
+def create_table
+  Clickhouse.connection.create_table("logs_test") do |t|
+    t.uint8        :id
+    t.float32      :price
+    t.string       :name
+    t.date         :date
+    t.date_time    :time
+    t.fixed_string :hex_id, 8
+    t.engine       "MergeTree(date, 8192)"
+  end
+end
+
 puts "Loading Clickhouse development environment (#{Clickhouse::VERSION})"
 Pry.start
