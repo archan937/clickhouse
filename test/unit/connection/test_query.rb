@@ -24,7 +24,7 @@ module Unit
             TSV
 
             @connection.expects(:to_select_query).with(options = {:from => "logs"})
-            @connection.expects(:request).returns(stub({body: body.gsub(/^\s+/, "")}))
+            @connection.expects(:get).returns(body.gsub(/^\s+/, ""))
             assert_equal [
               [1982, "Paul"],
               [1947, "Anna"]
@@ -43,7 +43,7 @@ module Unit
           describe "when empty result set" do
             it "returns an empty array" do
               @connection.expects(:to_select_query)
-              @connection.expects(:request).returns(stub({body: ""}))
+              @connection.expects(:get).returns("")
               assert_equal [], @connection.select_values({})
             end
           end
@@ -58,7 +58,7 @@ module Unit
               TSV
 
               @connection.expects(:to_select_query)
-              @connection.expects(:request).returns(stub({body: body.gsub(/^\s+/, "")}))
+              @connection.expects(:get).returns(body.gsub(/^\s+/, ""))
               assert_equal [
                 1982,
                 1947

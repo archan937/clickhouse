@@ -25,14 +25,14 @@ module Unit
 
           describe "when receiving 200" do
             it "returns true" do
-              Faraday::Connection.any_instance.expects(:get).returns(stub({:status => 200}))
+              Faraday::Connection.any_instance.expects(:get).returns(stub(:status => 200))
               assert_equal true, @connection.connect!
             end
           end
 
           describe "when receiving 500" do
             it "raises a Clickhouse::ConnectionError" do
-              Faraday::Connection.any_instance.expects(:get).returns(stub({:status => 500}))
+              Faraday::Connection.any_instance.expects(:get).returns(stub(:status => 500))
               assert_raises Clickhouse::ConnectionError do
                 @connection.connect!
               end
@@ -58,18 +58,22 @@ module Unit
         end
 
         describe "#get" do
-          it "gets delegated to the client" do
+          it "sends a GET request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:get).with(:foo)
+            params = {:query => "foo FORMAT TabSeparatedWithNamesAndTypes"}
+            client.expects(:get).with("/", params, nil).returns(stub(:body => ""))
+            @connection.stubs(:log)
             @connection.get(:foo)
           end
         end
 
         describe "#post" do
-          it "gets delegated to the client" do
+          it "sends a POST request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:post).with(:foo)
-            @connection.post(:foo)
+            params = {:query => "foo FORMAT TabSeparatedWithNamesAndTypes"}
+            client.expects(:post).with("/", params, "body").returns(stub(:body => ""))
+            @connection.stubs(:log)
+            @connection.post(:foo, "body")
           end
         end
 
@@ -79,15 +83,17 @@ module Unit
           end
 
           it "connects to the server first" do
+            @connection.instance_variable_set :@client, (client = mock)
             @connection.expects(:connect!)
-            @connection.stubs(:get)
+            client.stubs(:get).returns(stub(:body => ""))
             @connection.send :request, :get, "/", "query"
           end
 
           it "queries the server requesting a TabSeparatedWithNamesAndTypes formatted response" do
-            @connection.stubs(:connect!)
-            @connection.expects(:get).with("/", {:query => "#{query = "SELECT 1"} FORMAT TabSeparatedWithNamesAndTypes"}, nil)
-            @connection.send :request, :get, "/", query
+            @connection.instance_variable_set :@client, (client = mock)
+            params = {:query => "#{query = "SELECT 1"} FORMAT TabSeparatedWithNamesAndTypes"}
+            client.expects(:get).with("/", params, nil).returns(stub(:body => ""))
+            @connection.send :request, :get, query
           end
         end
       end

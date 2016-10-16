@@ -6,7 +6,7 @@ module Clickhouse
     module Query
 
       def query(query)
-        parse_response request(:get, "/", query).body
+        parse_response get(query)
       end
 
       def select_rows(options)

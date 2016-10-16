@@ -2,12 +2,6 @@ module Clickhouse
   class Connection
     module Client
 
-      def self.included(base)
-        base.extend Forwardable
-        base.def_delegators :@client, :get
-        base.def_delegators :@client, :post
-      end
-
       def connect!
         return if connected?
 
@@ -23,6 +17,14 @@ module Clickhouse
         instance_variables.include?(:@client) && !!@client
       end
 
+      def get(query)
+        request(:get, query)
+      end
+
+      def post(query, body = nil)
+        request(:post, query, body)
+      end
+
     private
 
       def url
@@ -33,10 +35,14 @@ module Clickhouse
         @client ||= Faraday.new(:url => url)
       end
 
-      def request(method, path, query, body = nil)
+      def request(method, query, body = nil)
         connect!
+
+        query = query.to_s.gsub(/(;|\bFORMAT \w+)/i, "")
+        params = {:query => "#{query} FORMAT TabSeparatedWithNamesAndTypes"}
         start = Time.now
-        send(method, path, {:query => "#{query} FORMAT TabSeparatedWithNamesAndTypes"}, body).tap do
+
+        client.send(method, "/", params, body).body.tap do
           log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
         end
       end
