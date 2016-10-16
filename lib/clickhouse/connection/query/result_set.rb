@@ -15,7 +15,10 @@ module Clickhouse
         end
 
         def each
-          size.times{|i| yield self[i]}
+          (0..(size - 1)).collect do |index|
+            yield self[index]
+            self[index]
+          end
         end
 
         def [](index)
@@ -38,25 +41,23 @@ module Clickhouse
         end
 
         def parse_value(type, value)
-          unless value == "NULL"
-            case type
-            when "UInt8", "UInt16", "UInt32", "UInt64", "Int8", "Int16", "Int32", "Int64"
-              parse_int_value value
-            when "Float32", "Float64"
-              parse_float_value value
-            when "String", "Enum8", "Enum16"
-              parse_string_value value
-            when /FixedString\(\d+\)/
-              parse_fixed_string_value value
-            when "Date"
-              parse_date_value value
-            when "DateTime"
-              parse_date_time_value value
-            when /Array\(/
-              parse_array_value value
-            else
-              raise NotImplementedError, "Cannot parse value of type #{type.inspect}"
-            end
+          case type
+          when "UInt8", "UInt16", "UInt32", "UInt64", "Int8", "Int16", "Int32", "Int64"
+            parse_int_value value
+          when "Float32", "Float64"
+            parse_float_value value
+          when "String", "Enum8", "Enum16"
+            parse_string_value value
+          when /FixedString\(\d+\)/
+            parse_fixed_string_value value
+          when "Date"
+            parse_date_value value
+          when "DateTime"
+            parse_date_time_value value
+          when /Array\(/
+            parse_array_value value
+          else
+            raise NotImplementedError, "Cannot parse value of type #{type.inspect}"
           end
         end
 
