@@ -60,7 +60,7 @@ module Unit
         describe "#get" do
           it "sends a GET request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:get).with("/?query=foo", nil).returns(stub(:body => ""))
+            client.expects(:get).with("/?query=foo", nil).returns(stub(:status => 200, :body => ""))
             @connection.stubs(:log)
             @connection.get(:foo)
           end
@@ -69,7 +69,7 @@ module Unit
         describe "#post" do
           it "sends a POST request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:post).with("/?query=foo", "body").returns(stub(:body => ""))
+            client.expects(:post).with("/?query=foo", "body").returns(stub(:status => 200, :body => ""))
             @connection.stubs(:log)
             @connection.post(:foo, "body")
           end
@@ -83,14 +83,24 @@ module Unit
           it "connects to the server first" do
             @connection.instance_variable_set :@client, (client = mock)
             @connection.expects(:connect!)
-            client.stubs(:get).returns(stub(:body => ""))
+            client.stubs(:get).returns(stub(:status => 200, :body => ""))
             @connection.send :request, :get, "/", "query"
           end
 
           it "queries the server returning the response" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:get).with("/?query=SELECT+1", nil).returns(response = mock)
+            client.expects(:get).with("/?query=SELECT+1", nil).returns(response = stub(:status => 200, :body => ""))
             assert_equal response, @connection.send(:request, :get, "SELECT 1")
+          end
+
+          describe "when not receiving status 200" do
+            it "raises a Clickhouse::QueryError" do
+              @connection.instance_variable_set :@client, (client = mock)
+              client.expects(:get).with("/?query=SELECT+1", nil).returns(response = stub(:status => 500, :body => ""))
+              assert_raises Clickhouse::QueryError do
+                @connection.send(:request, :get, "SELECT 1")
+              end
+            end
           end
         end
       end

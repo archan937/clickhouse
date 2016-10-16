@@ -6,7 +6,8 @@ module Clickhouse
     module Query
 
       def execute(query, body = nil)
-        post(query, body)
+        body = post(query, body).body.to_s
+        body.empty? ? true : body
       end
 
       def query(query)

@@ -39,8 +39,9 @@ module Clickhouse
         connect!
         query = query.to_s.strip
         start = Time.now
-        client.send(method, "/?query=#{CGI.escape(query)}", body).tap do
-          log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
+        client.send(method, "/?query=#{CGI.escape(query)}", body).tap do |response|
+          log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query.gsub(/( FORMAT \w+|;$)/, "")};[0m"
+          raise QueryError, response.body unless response.status == 200
         end
       end
 

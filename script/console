@@ -5,9 +5,8 @@ require "bundler"
 Bundler.require :default, :development
 
 def connect!(config = {})
-  Clickhouse.establish_connection(config)
   Clickhouse.logger = Logger.new(STDOUT)
-  nil
+  Clickhouse.establish_connection(config)
 end
 
 puts "Loading Clickhouse development environment (#{Clickhouse::VERSION})"
