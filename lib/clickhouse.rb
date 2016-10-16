@@ -1,3 +1,6 @@
+require "forwardable"
+require "csv"
+
 require "faraday"
 
 require "clickhouse/connection"

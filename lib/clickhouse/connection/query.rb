@@ -1,4 +1,5 @@
-require "csv"
+require "clickhouse/connection/query/result_set"
+require "clickhouse/connection/query/result_row"
 
 module Clickhouse
   class Connection
@@ -14,6 +15,10 @@ module Clickhouse
         log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
 
         parse_response response.body
+      end
+
+      def select_row(options)
+        select_rows(options)[0]
       end
 
       def select_values(options)
@@ -91,7 +96,7 @@ module Clickhouse
         rows = CSV.parse response.to_s, :col_sep => "\t"
         names = rows.shift
         types = rows.shift
-        rows
+        ResultSet.new rows, names, types
       end
 
     end

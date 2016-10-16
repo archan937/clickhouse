@@ -1,5 +1,3 @@
-require "forwardable"
-
 module Clickhouse
   class Connection
     module Client
