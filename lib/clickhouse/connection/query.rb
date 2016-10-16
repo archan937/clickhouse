@@ -5,16 +5,12 @@ module Clickhouse
   class Connection
     module Query
 
+      def query(query)
+        request :get, "/", query
+      end
+
       def select_rows(options)
-        connect!
-
-        start = Time.now
-        query = to_select_query(options)
-
-        response = get("/", {:query => query})
-        log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
-
-        parse_response response.body
+        query to_select_query(options)
       end
 
       def select_row(options)
@@ -32,18 +28,27 @@ module Clickhouse
 
     private
 
+      def request(method, path, query, body = nil)
+        connect!
+
+        start = Time.now
+        response = send(method, path, {:query => "#{query} FORMAT TabSeparatedWithNamesAndTypes"}, body)
+        log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
+
+        parse_response response.body
+      end
+
       def inspect_value(value)
         value.nil? ? "NULL" : value.inspect.gsub(/(^"|"$)/, "'").gsub("\\\"", "\"")
       end
 
       def to_select_options(options)
-        keys = [:select, :from, :where, :group, :having, :order, :limit, :offset, :format]
+        keys = [:select, :from, :where, :group, :having, :order, :limit, :offset]
 
         options = Hash[keys.zip(options.values_at(*keys))]
         options[:select] ||= "*"
         options[:limit] ||= 0 if options[:offset]
         options[:limit] = options.values_at(:offset, :limit).compact.join(", ") if options[:limit]
-        options[:format] = "TabSeparatedWithNamesAndTypes"
         options.delete(:offset)
 
         options

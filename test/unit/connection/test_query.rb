@@ -107,7 +107,6 @@ module Unit
               query = <<-SQL
                 SELECT *
                 FROM logs
-                FORMAT TabSeparatedWithNamesAndTypes
               SQL
               options = {
                 :from => "logs"
@@ -122,7 +121,6 @@ module Unit
                 query = <<-SQL
                   SELECT MIN(date)
                   FROM logs
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :select => "MIN(date)",
@@ -137,7 +135,6 @@ module Unit
                 query = <<-SQL
                   SELECT MIN(date), MAX(date)
                   FROM logs
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :select => ["MIN(date)", "MAX(date)"],
@@ -153,7 +150,6 @@ module Unit
                   SELECT *
                   FROM logs
                   WHERE empty(parent_id)
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :from => "logs",
@@ -171,7 +167,6 @@ module Unit
                   SELECT *
                   FROM logs
                   WHERE code >= 6 AND code <= 10
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :from => "logs",
@@ -189,7 +184,6 @@ module Unit
                   SELECT *
                   FROM logs
                   WHERE code IN (6, 7, 8, 9, 10)
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :from => "logs",
@@ -207,7 +201,6 @@ module Unit
                   SELECT *
                   FROM logs
                   WHERE id != 'cb5a67d2932911e6'
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :from => "logs",
@@ -225,7 +218,6 @@ module Unit
                   SELECT *
                   FROM logs
                   WHERE id = 'cb5a67d2932911e6'
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :from => "logs",
@@ -247,7 +239,6 @@ module Unit
                   HAVING MIN(severity) = 2
                   ORDER BY MIN(time) DESC
                   LIMIT 120, 60
-                  FORMAT TabSeparatedWithNamesAndTypes
                 SQL
                 options = {
                   :select => ["date", "COUNT(id)", "groupUniqArray(severity)", "SUM(clicks)"],
