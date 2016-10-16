@@ -5,3 +5,9 @@ class MiniTest::Test
     end
   end
 end
+
+class MiniTest::Spec
+  def assert_query(expected, actual)
+    assert_equal(expected.strip.gsub(/^\s+/, ""), actual)
+  end
+end
