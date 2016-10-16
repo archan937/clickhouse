@@ -14,8 +14,22 @@ module Unit
           @connection = Connection.new
         end
 
+        describe "#execute" do
+          it "sends a POST request" do
+            @connection.expects(:post).with("sql", nil).returns(stub(:status => 200, :body => ""))
+            assert_equal true, @connection.execute("sql")
+          end
+
+          describe "when server returns a non-empty body" do
+            it "returns the body of the response" do
+              @connection.expects(:post).with("sql", "body").returns(stub(:status => 200, :body => "Ok."))
+              assert_equal "Ok.", @connection.execute("sql", "body")
+            end
+          end
+        end
+
         describe "#select_rows" do
-          it "queries and parses the result set" do
+          it "sends a GET request and parses the result set" do
             body = <<-TSV
               year\tname
               UInt16\tString
