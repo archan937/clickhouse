@@ -32,6 +32,10 @@ module Clickhouse
 
     private
 
+      def inspect_value(value)
+        value.nil? ? "NULL" : value.inspect.gsub(/(^"|"$)/, "'").gsub("\\\"", "\"")
+      end
+
       def to_select_options(options)
         keys = [:select, :from, :where, :group, :having, :order, :limit, :offset, :format]
 
@@ -43,6 +47,17 @@ module Clickhouse
         options.delete(:offset)
 
         options
+      end
+
+      def to_segment(type, value)
+        case type
+        when :select
+          [value].flatten.join(", ")
+        when :where, :having
+          to_condition_statements(value)
+        else
+          value
+        end
       end
 
       def to_condition_statements(value)
@@ -64,29 +79,13 @@ module Clickhouse
         end.flatten.join(" AND ")
       end
 
-      def inspect_value(value)
-        value.nil? ? "NULL" : value.inspect.gsub(/(^"|"$)/, "'").gsub("\\\"", "\"")
-      end
-
       def to_select_query(options)
         to_select_options(options).collect do |(key, value)|
           next if value.nil? && (!value.respond_to?(:empty?) || value.empty?)
 
           statement = [key.to_s.upcase]
           statement << "BY" if %W(GROUP ORDER).include?(statement[0])
-
-          segment = begin
-            case statement[0]
-            when "SELECT"
-              [value].flatten.join(", ")
-            when "WHERE", "HAVING"
-              to_condition_statements(value)
-            else
-              value
-            end
-          end
-
-          statement << segment.to_s
+          statement << to_segment(key, value)
           statement.join(" ")
 
         end.compact.join("\n").force_encoding("UTF-8")

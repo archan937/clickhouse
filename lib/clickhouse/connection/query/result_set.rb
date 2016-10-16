@@ -41,25 +41,51 @@ module Clickhouse
           unless value == "NULL"
             case type
             when "UInt8", "UInt16", "UInt32", "UInt64", "Int8", "Int16", "Int32", "Int64"
-              value.to_i
+              parse_int_value value
             when "Float32", "Float64"
-              value.to_f
+              parse_float_value value
             when "String", "Enum8", "Enum16"
-              value.force_encoding("UTF-8")
+              parse_string_value value
             when /FixedString\(\d+\)/
-              value.delete("\000").force_encoding("UTF-8")
+              parse_fixed_string_value value
             when "Date"
-              Date.parse(value)
+              parse_date_value value
             when "DateTime"
-              Time.parse(value)
+              parse_date_time_value value
             when /Array\(/
-              JSON.parse(value).flatten
-            # when /Tuple\(/
-            #   what to do?
+              parse_array_value value
             else
               raise NotImplementedError, "Cannot parse value of type #{type.inspect}"
             end
           end
+        end
+
+        def parse_int_value(value)
+          value.to_i
+        end
+
+        def parse_float_value(value)
+          value.to_f
+        end
+
+        def parse_string_value(value)
+          value.force_encoding("UTF-8")
+        end
+
+        def parse_fixed_string_value(value)
+          value.delete("\000").force_encoding("UTF-8")
+        end
+
+        def parse_date_value(value)
+          Date.parse(value)
+        end
+
+        def parse_date_time_value(value)
+          Time.parse(value)
+        end
+
+        def parse_array_value(value)
+          JSON.parse(value)
         end
 
       end
