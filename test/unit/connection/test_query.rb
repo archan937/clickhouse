@@ -15,34 +15,20 @@ module Unit
         end
 
         describe "#select_rows" do
-          describe "when disconnected" do
-            it "connects to the server first" do
-              @connection.expects(:connect!)
-              @connection.expects(:get).returns(stub({body: ""}))
-              @connection.select_rows({})
-            end
-          end
+          it "queries and parses the result set" do
+            body = <<-TSV
+              year\tname
+              UInt16\tString
+              1982\tPaul
+              1947\tAnna
+            TSV
 
-          describe "when connected" do
-            before do
-              @connection.expects(:connect!)
-            end
-
-            it "generates the SELECT query" do
-              body = <<-TSV
-                year\tname
-                UInt16\tString
-                1982\tPaul
-                1947\tAnna
-              TSV
-
-              @connection.expects(:to_select_query).with(options = {:from => "logs"})
-              @connection.expects(:get).returns(stub({body: body.gsub(/^\s+/, "")}))
-              assert_equal [
-                [1982, "Paul"],
-                [1947, "Anna"]
-              ], @connection.select_rows(options).to_a
-            end
+            @connection.expects(:to_select_query).with(options = {:from => "logs"})
+            @connection.expects(:request).returns(stub({body: body.gsub(/^\s+/, "")}))
+            assert_equal [
+              [1982, "Paul"],
+              [1947, "Anna"]
+            ], @connection.select_rows(options).to_a
           end
         end
 
@@ -54,14 +40,10 @@ module Unit
         end
 
         describe "#select_values" do
-          before do
-            @connection.expects(:connect!)
-          end
-
           describe "when empty result set" do
             it "returns an empty array" do
               @connection.expects(:to_select_query)
-              @connection.expects(:get).returns(stub({body: ""}))
+              @connection.expects(:request).returns(stub({body: ""}))
               assert_equal [], @connection.select_values({})
             end
           end
@@ -76,7 +58,7 @@ module Unit
               TSV
 
               @connection.expects(:to_select_query)
-              @connection.expects(:get).returns(stub({body: body.gsub(/^\s+/, "")}))
+              @connection.expects(:request).returns(stub({body: body.gsub(/^\s+/, "")}))
               assert_equal [
                 1982,
                 1947

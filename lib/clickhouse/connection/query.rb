@@ -6,7 +6,7 @@ module Clickhouse
     module Query
 
       def query(query)
-        request :get, "/", query
+        parse_response request(:get, "/", query).body
       end
 
       def select_rows(options)
@@ -27,16 +27,6 @@ module Clickhouse
       end
 
     private
-
-      def request(method, path, query, body = nil)
-        connect!
-
-        start = Time.now
-        response = send(method, path, {:query => "#{query} FORMAT TabSeparatedWithNamesAndTypes"}, body)
-        log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
-
-        parse_response response.body
-      end
 
       def inspect_value(value)
         value.nil? ? "NULL" : value.inspect.gsub(/(^"|"$)/, "'").gsub("\\\"", "\"")

@@ -33,6 +33,14 @@ module Clickhouse
         @client ||= Faraday.new(:url => url)
       end
 
+      def request(method, path, query, body = nil)
+        connect!
+        start = Time.now
+        send(method, path, {:query => "#{query} FORMAT TabSeparatedWithNamesAndTypes"}, body).tap do
+          log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query}[0m"
+        end
+      end
+
     end
   end
 end

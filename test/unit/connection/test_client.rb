@@ -72,6 +72,24 @@ module Unit
             @connection.post(:foo)
           end
         end
+
+        describe "#request" do
+          before do
+            @connection.expects(:log)
+          end
+
+          it "connects to the server first" do
+            @connection.expects(:connect!)
+            @connection.stubs(:get)
+            @connection.send :request, :get, "/", "query"
+          end
+
+          it "queries the server requesting a TabSeparatedWithNamesAndTypes formatted response" do
+            @connection.stubs(:connect!)
+            @connection.expects(:get).with("/", {:query => "#{query = "SELECT 1"} FORMAT TabSeparatedWithNamesAndTypes"}, nil)
+            @connection.send :request, :get, "/", query
+          end
+        end
       end
 
     end
