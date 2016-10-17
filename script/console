@@ -9,14 +9,23 @@ def connect!(config = {})
   Clickhouse.establish_connection(config)
 end
 
+def conn(config = {})
+  connect!(config) unless Clickhouse.connection
+  Clickhouse.connection
+end
+
+def logs
+  "logs_test"
+end
+
 def create_table
-  Clickhouse.connection.create_table("logs_test") do |t|
-    t.uint8        :id
-    t.float32      :price
-    t.string       :name
+  conn.create_table(logs) do |t|
+    t.fixed_string :id, 16
     t.date         :date
     t.date_time    :time
-    t.fixed_string :hex_id, 8
+    t.string       :event
+    t.uint32       :user_id
+    t.float32      :revenue
     t.engine       "MergeTree(date, 8192)"
   end
 end
