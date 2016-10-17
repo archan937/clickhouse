@@ -120,10 +120,11 @@ ENGINE = MergeTree(date, 8192)
         describe "#insert_rows" do
           before do
             @csv = <<-CSV
-id,first_name,last_name
-12345,Paul,Engel
-67890,Bruce,Wayne
+              id,first_name,last_name
+              12345,Paul,Engel
+              67890,Bruce,Wayne
             CSV
+            @csv.gsub!(/^\s+/, "")
           end
 
           describe "when using hashes" do
@@ -158,6 +159,7 @@ id,first_name,last_name
 
             @connection.expects(:to_select_query).with(options = {:from => "logs"})
             @connection.expects(:get).returns(stub(:body => body.gsub(/^\s+/, "")))
+
             assert_equal [
               [1982, "Paul"],
               [1947, "Anna"]
@@ -213,6 +215,13 @@ id,first_name,last_name
               @connection.expects(:select_values).with(options = {:foo => "bar"}).returns([1982])
               assert_equal 1982, @connection.select_value(options)
             end
+          end
+        end
+
+        describe "#count" do
+          it "returns the first value of the first row" do
+            @connection.expects(:select_value).with(:select => "COUNT(*)", :from => "logs").returns(1982)
+            assert_equal 1982, @connection.count(:from => "logs")
           end
         end
 

@@ -69,6 +69,10 @@ module Clickhouse
         values[0] if values
       end
 
+      def count(options)
+        select_value options.merge(:select => "COUNT(*)")
+      end
+
     private
 
       def generate_csv(rows, names = nil)
