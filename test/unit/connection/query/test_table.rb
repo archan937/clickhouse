@@ -19,12 +19,12 @@ module Unit
 
             sql = <<-SQL
 CREATE TABLE logs_test (
-  UInt8          id,
-  Float32        price,
-  String         name,
-  Date           date,
-  DateTime       time,
-  FixedString(8) hex_id
+  id     UInt8,
+  price  Float32,
+  name   String,
+  date   Date,
+  time   DateTime,
+  hex_id FixedString(8)
 )
 ENGINE = MergeTree(date, 8192)
             SQL

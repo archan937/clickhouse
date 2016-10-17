@@ -21,12 +21,13 @@ end
 def create_table
   conn.create_table(logs) do |t|
     t.fixed_string :id, 16
+    t.uint16       :year
     t.date         :date
     t.date_time    :time
     t.string       :event
     t.uint32       :user_id
     t.float32      :revenue
-    t.engine       "MergeTree(date, 8192)"
+    t.engine       "MergeTree(date, (year, date), 8192)"
   end
 end
 

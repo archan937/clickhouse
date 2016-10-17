@@ -25,7 +25,7 @@ module Clickhouse
     @configurations if instance_variables.include?(:@configurations)
   end
 
-  def self.establish_connection(arg)
+  def self.establish_connection(arg = {})
     config = arg.is_a?(Hash) ? arg : (configurations || {})[arg.to_s]
     if config
       @connection = Connection.new(config)
