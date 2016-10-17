@@ -14,12 +14,12 @@ def conn(config = {})
   Clickhouse.connection
 end
 
-def logs
-  "logs_test"
+def events
+  "events"
 end
 
 def create_table
-  conn.create_table(logs) do |t|
+  conn.create_table(events) do |t|
     t.fixed_string :id, 16
     t.uint16       :year
     t.date         :date
@@ -28,6 +28,29 @@ def create_table
     t.uint32       :user_id
     t.float32      :revenue
     t.engine       "MergeTree(date, (year, date), 8192)"
+  end
+end
+
+def insert_rows
+  conn.insert_rows(events, :names => %w(id year date time event user_id revenue)) do |rows|
+    rows << [
+      "d91d1c90",
+      2016,
+      "2016-10-17",
+      "2016-10-17 23:14:28",
+      "click",
+      1982,
+      0.18
+    ]
+    rows << [
+      "d91d2294",
+      2016,
+      "2016-10-17",
+      "2016-10-17 23:14:41",
+      "click",
+      1947,
+      0.203
+    ]
   end
 end
 
