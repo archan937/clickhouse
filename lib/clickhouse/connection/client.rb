@@ -31,6 +31,11 @@ module Clickhouse
         "#{@config[:scheme]}://#{@config[:host]}:#{@config[:port]}"
       end
 
+      def path(query)
+        database = "database=#{@config[:database]}&" if @config[:database]
+        "/?#{database}query=#{CGI.escape(query)}"
+      end
+
       def client
         @client ||= Faraday.new(:url => url)
       end
@@ -39,7 +44,7 @@ module Clickhouse
         connect!
         query = query.to_s.strip
         start = Time.now
-        client.send(method, "/?query=#{CGI.escape(query)}", body).tap do |response|
+        client.send(method, path(query), body).tap do |response|
           log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query.gsub(/( FORMAT \w+|;$)/, "")};[0m"
           raise QueryError, response.body unless response.status == 200
         end

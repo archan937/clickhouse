@@ -103,6 +103,16 @@ module Unit
             end
           end
         end
+
+        describe "when having configured a database" do
+          it "includes the database in the querystring" do
+            @connection.expects(:log)
+            @connection.instance_variable_get(:@config)[:database] = "system"
+            @connection.instance_variable_set(:@client, (client = mock))
+            client.expects(:get).with("/?database=system&query=SELECT+1", nil).returns(response = stub(:status => 200, :body => ""))
+            assert_equal response, @connection.send(:request, :get, "SELECT 1")
+          end
+        end
       end
 
     end
