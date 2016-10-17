@@ -16,6 +16,7 @@ For support, remarks and requests, please mail me at [pm_engel@icloud.com](mailt
 
 * Write documentation
 * Support authentication
+* Specify database when querying
 
 ## License
 
