@@ -15,7 +15,6 @@ For support, remarks and requests, please mail me at [pm_engel@icloud.com](mailt
 ### TODO
 
 * Write documentation
-* Support authentication
 * Support cluster connections
 
 ## License

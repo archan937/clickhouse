@@ -4,13 +4,8 @@ module Clickhouse
 
       def connect!
         return if connected?
-
-        response = client.get "/"
-        raise ConnectionError, "Unexpected response status: #{response.status}" unless response.status == 200
-        true
-
-      rescue Faraday::ConnectionFailed => e
-        raise ConnectionError, e.message
+        ensure_authentication
+        ping!
       end
 
       def connected?
@@ -38,6 +33,21 @@ module Clickhouse
 
       def client
         @client ||= Faraday.new(:url => url)
+      end
+
+      def ensure_authentication
+        username, password = @config.values_at(:username, :password)
+        client.basic_auth(username || "default", password) if username || password
+      end
+
+      def ping!
+        status = client.get("/").status
+        if status != 200
+          raise ConnectionError, "Unexpected response status: #{status}"
+        end
+        true
+      rescue Faraday::ConnectionFailed => e
+        raise ConnectionError, e.message
       end
 
       def request(method, query, body = nil)
