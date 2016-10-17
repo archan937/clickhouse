@@ -32,13 +32,14 @@ module Clickhouse
 
       private
 
-        def method_missing(name, *args, &block)
+        def method_missing(name, *args)
           type = name.to_s
                   .gsub(/(^.|_\w)/) {
                     $1.upcase
                   }
-                  .gsub("_", "")
                   .gsub("Uint", "UInt")
+                  .delete("_")
+
           type << "(#{args[1]})" if args[1]
           @columns << [type, args[0]]
         end

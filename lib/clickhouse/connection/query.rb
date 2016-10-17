@@ -72,7 +72,9 @@ module Clickhouse
     private
 
       def generate_csv(rows, names = nil)
-        if hashes = rows[0].is_a?(Hash)
+        hashes = rows[0].is_a?(Hash)
+
+        if hashes
           names ||= rows[0].keys
         end
 
