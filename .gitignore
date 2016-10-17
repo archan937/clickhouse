@@ -1,7 +1,9 @@
 .DS_Store
 .bundle
+.env
 .rvmrc
 Gemfile.lock
+coverage
 doc
 pkg
 test/coverage

@@ -1,4 +1,4 @@
-# Clickhouse [![Build Status](https://travis-ci.org/archan937/clickhouse.svg?branch=master)](https://travis-ci.org/archan937/clickhouse) [![Code Climate](https://codeclimate.com/github/archan937/clickhouse/badges/gpa.svg)](https://codeclimate.com/github/archan937/clickhouse) [![Gem](https://img.shields.io/gem/v/clickhouse.svg)](https://rubygems.org/gems/clickhouse) [![Gem](https://img.shields.io/gem/dt/clickhouse.svg)](https://rubygems.org/gems/clickhouse)
+# Clickhouse [![Build Status](https://travis-ci.org/archan937/clickhouse.svg?branch=master)](https://travis-ci.org/archan937/clickhouse) [![Code Climate](https://codeclimate.com/github/archan937/clickhouse/badges/gpa.svg)](https://codeclimate.com/github/archan937/clickhouse) [![Test Coverage](https://codeclimate.com/github/archan937/clickhouse/badges/coverage.svg)](https://codeclimate.com/github/archan937/clickhouse/coverage) [![Gem](https://img.shields.io/gem/v/clickhouse.svg)](https://rubygems.org/gems/clickhouse) [![Gem](https://img.shields.io/gem/dt/clickhouse.svg)](https://rubygems.org/gems/clickhouse)
 
 A Ruby database driver for Clickhouse.
 
@@ -16,6 +16,7 @@ For support, remarks and requests, please mail me at [pm_engel@icloud.com](mailt
 
 * Write documentation
 * Support authentication
+* Support cluster connections
 
 ## License
 
