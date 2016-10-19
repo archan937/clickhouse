@@ -20,7 +20,7 @@ module Clickhouse
         def normalize_keys(keys)
           if keys
             keys.collect do |key|
-              key.match /^any\(([^\)]+)\)$/
+              key.match(/^any\(([^\)]+)\)$/)
               $1 || key
             end
           else
