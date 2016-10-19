@@ -30,21 +30,24 @@ module Unit
 
         describe "#query" do
           it "sends a GET request requesting a TSV response including names and types" do
-            @connection.expects(:get).with("sql FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.expects(:get).with("sql FORMAT JSONCompact").returns(stub(:status => 200, :body => ""))
+            @connection.stubs(:parse_response)
             assert_equal [], @connection.query("sql").to_a
           end
         end
 
         describe "#databases" do
           it "sends a 'SHOW DATABASES' query" do
-            @connection.expects(:get).with("SHOW DATABASES FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.expects(:get).with("SHOW DATABASES FORMAT JSONCompact").returns(stub(:status => 200, :body => "{}"))
+            @connection.stubs(:parse_response).returns([])
             @connection.databases
           end
         end
 
         describe "#tables" do
           it "sends a 'SHOW TABLES' query" do
-            @connection.expects(:get).with("SHOW TABLES FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.expects(:get).with("SHOW TABLES FORMAT JSONCompact").returns(stub(:status => 200, :body => "{}"))
+            @connection.stubs(:parse_response).returns([])
             @connection.tables
           end
         end
@@ -77,7 +80,8 @@ ENGINE = MergeTree(date, 8192)
 
         describe "#describe_table" do
           it "sends a 'DESCRIBE TABLE <name>' query" do
-            @connection.expects(:get).with("DESCRIBE TABLE logs FORMAT TabSeparatedWithNamesAndTypes").returns(stub(:status => 200, :body => ""))
+            @connection.expects(:get).with("DESCRIBE TABLE logs FORMAT JSONCompact").returns(stub(:status => 200, :body => ""))
+            @connection.stubs(:parse_response)
             @connection.describe_table("logs")
           end
         end
@@ -150,15 +154,21 @@ ENGINE = MergeTree(date, 8192)
 
         describe "#select_rows" do
           it "sends a GET request and parses the result set" do
-            body = <<-TSV
-              year\tname
-              UInt16\tString
-              1982\tPaul
-              1947\tAnna
-            TSV
+            body = <<-JAVASCRIPT
+              {
+                "meta": [
+                  {"name": "year", "type": "UInt16"},
+                  {"name": "name", "type": "String"}
+                ],
+                "data": [
+                  [1982, "Paul"],
+                  [1947, "Anna"]
+                ]
+              }
+            JAVASCRIPT
 
             @connection.expects(:to_select_query).with(options = {:from => "logs"})
-            @connection.expects(:get).returns(stub(:body => body.gsub(/^\s+/, "")))
+            @connection.expects(:get).returns(stub(:body => body))
 
             assert_equal [
               [1982, "Paul"],
@@ -179,21 +189,28 @@ ENGINE = MergeTree(date, 8192)
             it "returns an empty array" do
               @connection.expects(:to_select_query)
               @connection.expects(:get).returns(stub(:body => ""))
+              @connection.stubs(:parse_response).returns([])
               assert_equal [], @connection.select_values({})
             end
           end
 
           describe "when getting data" do
             it "returns every first value of every row" do
-              body = <<-TSV
-                year\tname
-                UInt16\tString
-                1982\tPaul
-                1947\tAnna
-              TSV
+              body = <<-JAVASCRIPT
+                {
+                  "meta": [
+                    {"name": "year", "type": "UInt16"},
+                    {"name": "name", "type": "String"}
+                  ],
+                  "data": [
+                    [1982, "Paul"],
+                    [1947, "Anna"]
+                  ]
+                }
+              JAVASCRIPT
 
               @connection.expects(:to_select_query)
-              @connection.expects(:get).returns(stub(:body => body.gsub(/^\s+/, "")))
+              @connection.expects(:get).returns(stub(:body => body))
               assert_equal [
                 1982,
                 1947

@@ -13,7 +13,7 @@ module Clickhouse
 
       def query(query)
         query = query.to_s.gsub(/(;|\bFORMAT \w+)/i, "").strip
-        query += " FORMAT TabSeparatedWithNamesAndTypes"
+        query += " FORMAT JSONCompact"
         parse_response get(query).body.to_s
       end
 
@@ -70,7 +70,20 @@ module Clickhouse
       end
 
       def count(options)
-        select_value options.merge(:select => "COUNT(*)")
+        options = options.merge(:select => "COUNT(*)")
+        select_value(options).to_i
+      end
+
+      def to_select_query(options)
+        to_select_options(options).collect do |(key, value)|
+          next if value.nil? || (value.respond_to?(:empty?) && value.empty?)
+
+          statement = [key.to_s.upcase]
+          statement << "BY" if %W(GROUP ORDER).include?(statement[0])
+          statement << to_segment(key, value)
+          statement.join(" ")
+
+        end.compact.join("\n").force_encoding("UTF-8")
       end
 
     private
@@ -111,7 +124,7 @@ module Clickhouse
         when :select
           [value].flatten.join(", ")
         when :where, :having
-          to_condition_statements(value)
+          value.is_a?(Hash) ? to_condition_statements(value) : value
         else
           value
         end
@@ -136,23 +149,11 @@ module Clickhouse
         end.flatten.join(" AND ")
       end
 
-      def to_select_query(options)
-        to_select_options(options).collect do |(key, value)|
-          next if value.nil? && (!value.respond_to?(:empty?) || value.empty?)
-
-          statement = [key.to_s.upcase]
-          statement << "BY" if %W(GROUP ORDER).include?(statement[0])
-          statement << to_segment(key, value)
-          statement.join(" ")
-
-        end.compact.join("\n").force_encoding("UTF-8")
-      end
-
       def parse_response(response)
-        rows = CSV.parse response, :col_sep => "\t"
-        names = rows.shift
-        types = rows.shift
-        ResultSet.new rows, names, types
+        data = JSON.parse response
+        names = data["meta"].collect{|column| column["name"]}
+        types = data["meta"].collect{|column| column["type"]}
+        ResultSet.new data["data"], names, types
       end
 
     end

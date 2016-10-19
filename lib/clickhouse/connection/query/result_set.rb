@@ -31,8 +31,8 @@ module Clickhouse
           !empty?
         end
 
-        def to_hashes
-          collect(&:to_hash)
+        def to_hashes(symbolize = false)
+          collect{|row| row.to_hash(symbolize)}
         end
 
       private
@@ -92,7 +92,7 @@ module Clickhouse
         end
 
         def parse_array_value(value)
-          JSON.parse(value)
+          value
         end
 
       end
