@@ -62,6 +62,14 @@ module Unit
             Clickhouse::Connection.expects(:new).with(config).returns(@connection)
             Clickhouse.establish_connection "foo"
           end
+
+          describe "cluster connections" do
+            it "creates a connection pool" do
+              config = {:urls => %w(localhost:1234 localhost:1235 localhost:1236)}
+              Clickhouse::Cluster.expects(:new).with(config).returns(@connection)
+              Clickhouse.establish_connection config
+            end
+          end
         end
 
         describe "when invalid" do

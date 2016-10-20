@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.version       = Clickhouse::VERSION
 
   gem.add_dependency "faraday"
+  gem.add_dependency "pond"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "pry"

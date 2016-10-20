@@ -1,8 +1,11 @@
+require "uri"
 require "forwardable"
 require "csv"
 
 require "faraday"
+require "pond"
 
+require "clickhouse/cluster"
 require "clickhouse/connection"
 require "clickhouse/error"
 require "clickhouse/version"
@@ -28,8 +31,7 @@ module Clickhouse
   def self.establish_connection(arg = {})
     config = arg.is_a?(Hash) ? arg : (configurations || {})[arg.to_s]
     if config
-      @connection = Connection.new(config)
-      @connection.connect!
+      connect!(config)
     else
       raise InvalidConnectionError, "Invalid connection specified: #{arg.inspect}"
     end
@@ -38,5 +40,15 @@ module Clickhouse
   def self.connection
     @connection if instance_variables.include?(:@connection)
   end
+
+# private
+
+  def self.connect!(config)
+    klass = (config[:urls] || config["urls"]) ? Cluster : Connection
+    @connection = klass.new(config)
+    @connection.connect!
+  end
+
+  private_class_method :connect!
 
 end
