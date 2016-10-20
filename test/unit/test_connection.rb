@@ -37,6 +37,17 @@ module Unit
             }, connection.instance_variable_get(:@config))
           end
         end
+
+        describe "when passing a URL" do
+          it "derives the scheme, host and port" do
+            connection = Clickhouse::Connection.new :url => "https://19.82.8.1:1947"
+            assert_equal({
+              :scheme => "https",
+              :host => "19.82.8.1",
+              :port => 1947
+            }, connection.instance_variable_get(:@config))
+          end
+        end
       end
     end
 
