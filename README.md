@@ -186,10 +186,6 @@ You can also run a single test file:
 
 For support, remarks and requests, please mail me at [pm_engel@icloud.com](mailto:pm_engel@icloud.com).
 
-## TODO
-
-* Support cluster connections
-
 ## License
 
 Copyright (c) 2016 Paul Engel, released under the MIT license

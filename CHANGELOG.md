@@ -1,5 +1,12 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.2 (October 20, 2016)
+
+* Being able to specify a URL
+* Raising a Clickhouse::ConnectionError when getting a Faraday::Error
+* Made Clickhouse::Connection::Client#ping! public
+* Supporting cluster connections using Pond (thanks @chanks)
+
 ### Version 0.1.1 (October 19, 2016)
 
 * Using the JSONCompact format as query output which does not brake when having a JSON string within the data
