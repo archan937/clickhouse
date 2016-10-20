@@ -3,9 +3,18 @@ module Clickhouse
     module Client
 
       def connect!
-        return if connected?
+        ping! unless connected?
+      end
+
+      def ping!
         ensure_authentication
-        ping!
+        status = client.get("/").status
+        if status != 200
+          raise ConnectionError, "Unexpected response status: #{status}"
+        end
+        true
+      rescue Faraday::Error => e
+        raise ConnectionError, e.message
       end
 
       def connected?
@@ -20,11 +29,11 @@ module Clickhouse
         request(:post, query, body)
       end
 
-    private
-
       def url
         "#{@config[:scheme]}://#{@config[:host]}:#{@config[:port]}"
       end
+
+    private
 
       def path(query)
         database = "database=#{@config[:database]}&" if @config[:database]
@@ -40,16 +49,6 @@ module Clickhouse
         client.basic_auth(username || "default", password) if username || password
       end
 
-      def ping!
-        status = client.get("/").status
-        if status != 200
-          raise ConnectionError, "Unexpected response status: #{status}"
-        end
-        true
-      rescue Faraday::ConnectionFailed => e
-        raise ConnectionError, e.message
-      end
-
       def request(method, query, body = nil)
         connect!
         query = query.to_s.strip
@@ -58,6 +57,8 @@ module Clickhouse
           log :info, "\n  [1m[35mSQL (#{((Time.now - start) * 1000).round(1)}ms)[0m  #{query.gsub(/( FORMAT \w+|;$)/, "")};[0m"
           raise QueryError, response.body unless response.status == 200
         end
+      rescue Faraday::Error => e
+        raise ConnectionError, e.message
       end
 
     end

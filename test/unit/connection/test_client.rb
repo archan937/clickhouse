@@ -77,7 +77,7 @@ module Unit
 
         describe "#request" do
           before do
-            @connection.expects(:log)
+            @connection.stubs(:log)
           end
 
           it "connects to the server first" do
@@ -102,6 +102,16 @@ module Unit
               end
             end
           end
+
+          describe "when getting Faraday::Error" do
+            it "raises a Clickhouse::ConnectionError" do
+              @connection.instance_variable_set :@client, (client = mock)
+              client.expects(:get).raises(Faraday::ConnectionFailed.new("Failed to connect"))
+              assert_raises Clickhouse::ConnectionError do
+                @connection.send(:request, :get, "SELECT 1")
+              end
+            end
+          end
         end
 
         describe "configuration" do
@@ -117,8 +127,8 @@ module Unit
 
           describe "authentication" do
             it "includes the credentials in the request headers" do
+              Faraday::Connection.any_instance.expects(:get).returns(stub(status: 200))
               connection = Clickhouse::Connection.new :password => "awesomepassword"
-              connection.expects(:ping!)
               connection.connect!
               assert_equal "Basic ZGVmYXVsdDphd2Vzb21lcGFzc3dvcmQ=", connection.send(:client).headers["Authorization"].force_encoding("UTF-8")
             end
