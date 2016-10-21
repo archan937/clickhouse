@@ -33,7 +33,7 @@ module Clickhouse
       pond.checkout do |connection|
         connection.send(*args, &block)
       end
-    rescue
+    rescue ::Clickhouse::ConnectionError
       retry if pond.available.any?
     end
 

@@ -34,6 +34,7 @@ module Unit
         describe "when connection fails" do
           it "removes invalid connections from the pond" do
             cluster = Clickhouse::Cluster.new :urls => %w(http://localhost:1234 http://localhost:1235 http://localhost:1236)
+
             assert_equal %w(
               http://localhost:1234
               http://localhost:1235
@@ -42,6 +43,29 @@ module Unit
 
             cluster.tables
             assert_equal [], cluster.pond.available.collect(&:url)
+          end
+        end
+
+        describe "when error gets raised other than Clickhouse::ConnectionError" do
+          it "does not remove the connection from the pond" do
+            Clickhouse::Connection.any_instance.expects(:ping!)
+
+            cluster = Clickhouse::Cluster.new :urls => %w(http://localhost:1234 http://localhost:1235 http://localhost:1236)
+            assert_equal %w(
+              http://localhost:1234
+              http://localhost:1235
+              http://localhost:1236
+            ), cluster.pond.available.collect(&:url)
+
+            assert_raises NoMethodError do
+              cluster.select_rows ""
+            end
+
+            assert_equal %w(
+              http://localhost:1235
+              http://localhost:1236
+              http://localhost:1234
+            ), cluster.pond.available.collect(&:url)
           end
         end
       end

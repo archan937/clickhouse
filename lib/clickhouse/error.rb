@@ -3,16 +3,16 @@ module Clickhouse
   class Error < StandardError
   end
 
-  class InvalidConnectionError < Error
-  end
-
   class ConnectionError < Error
   end
 
-  class InvalidQueryError < Error
+  class InvalidConnectionError < ConnectionError
   end
 
   class QueryError < Error
+  end
+
+  class InvalidQueryError < QueryError
   end
 
 end
