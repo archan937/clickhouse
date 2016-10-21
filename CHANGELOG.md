@@ -1,5 +1,9 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.3 (October 21, 2016)
+
+* Only removing connections from cluster connection pool after a Clickhouse::ConnectionError
+
 ### Version 0.1.2 (October 20, 2016)
 
 * Being able to specify a URL
