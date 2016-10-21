@@ -141,6 +141,40 @@ GROUP BY year, date;
 => [2, 2016, #<Date: 2016-10-17 ((2457679j,0s,0n),+0s,2299161j)>, 0.1915000081062317]
 ```
 
+### Connecting to a cluster
+
+To connect to a cluster you only need to specify the URLs of the cluster servers in `:urls` of the configuration and that is it! The API of using Clickhouse stays the same.
+
+```ruby
+Clickhouse.establish_connection urls: %w(http://192.168.99.100:32809 http://192.168.99.100:32812 http://192.168.99.100:32815)
+=> true
+
+Clickhouse.connection.tables
+I, [2016-10-21T11:56:47.375772 #63374]  INFO -- :
+  SQL (6.2ms)  SHOW TABLES;
+=> ["events"]
+```
+
+In case of a connection dropping out, Clickhouse will retry the request with another connection. The failed connection will also be removed from the connection pool.
+
+```ruby
+Clickhouse.establish_connection urls: %w(http://192.168.99.100:32809 http://192.168.99.100:1 http://192.168.99.100:32815)
+=> true
+
+Clickhouse.connection.pond.available.collect(&:url)
+=> ["http://192.168.99.100:1", "http://192.168.99.100:32815", "http://192.168.99.100:32809"]
+
+Clickhouse.connection.tables
+I, [2016-10-21T12:11:55.974573 #63527]  INFO -- :
+  SQL (7.1ms)  SHOW TABLES;
+=> ["events"]
+
+Clickhouse.connection.pond.available.collect(&:url)
+=> ["http://192.168.99.100:32809", "http://192.168.99.100:32815"]
+```
+
+If all the connections failed, it will just return `nil`.
+
 ### Check out the tests
 
 To see what more the `Clickhouse` gem has to offer, please take a look at the unit tests ( [test/unit/connection/test_query.rb](https://github.com/archan937/clickhouse/blob/master/test/unit/connection/test_query.rb) for instance).
