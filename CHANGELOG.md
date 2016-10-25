@@ -1,5 +1,10 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.4 (October 25, 2016)
+
+* Ensured that Clickhouse does not modify the passed cluster config
+* Introduced Clickhouse#connect which returns either a cluster or connection without memoizing it as Clickhouse#connection
+
 ### Version 0.1.3 (October 21, 2016)
 
 * Only removing connections from cluster connection pool after a Clickhouse::ConnectionError
