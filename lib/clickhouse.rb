@@ -37,18 +37,18 @@ module Clickhouse
     end
   end
 
-  def self.connection
-    @connection if instance_variables.include?(:@connection)
-  end
-
-# private
-
   def self.connect!(config)
-    klass = (config[:urls] || config["urls"]) ? Cluster : Connection
-    @connection = klass.new(config)
+    @connection = connect(config)
     @connection.connect!
   end
 
-  private_class_method :connect!
+  def self.connect(config)
+    klass = (config[:urls] || config["urls"]) ? Cluster : Connection
+    klass.new(config)
+  end
+
+  def self.connection
+    @connection if instance_variables.include?(:@connection)
+  end
 
 end
