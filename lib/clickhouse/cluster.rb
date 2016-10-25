@@ -4,9 +4,10 @@ module Clickhouse
     attr_reader :pond
 
     def initialize(config)
+      config = config.dup
       urls = config.delete(:urls) || config.delete("urls")
-      @pond = ::Pond.new :maximum_size => urls.size, :timeout => 0.1
 
+      @pond = ::Pond.new :maximum_size => urls.size, :timeout => 0.1
       block = ::Proc.new do
         url = (urls - pond.available.collect(&:url)).first || urls.sample
         ::Clickhouse::Connection.new(config.merge(:url => url))

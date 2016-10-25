@@ -10,6 +10,12 @@ module Unit
           assert_equal true, cluster.pond.is_a?(Pond)
         end
 
+        it "does not modify the passed config" do
+          config = {:urls => %w(localhost:1234 localhost:1235 localhost:1236)}
+          Clickhouse::Cluster.new config
+          assert_equal({:urls => %w(localhost:1234 localhost:1235 localhost:1236)}, config)
+        end
+
         describe "when connection succeeds" do
           it "keeps valid connections from the pond" do
             Clickhouse::Connection.any_instance.expects(:tables)
