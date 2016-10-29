@@ -37,12 +37,12 @@ module Clickhouse
     end
   end
 
-  def self.connect!(config)
+  def self.connect!(config = {})
     @connection = connect(config)
     @connection.connect!
   end
 
-  def self.connect(config)
+  def self.connect(config = {})
     klass = (config[:urls] || config["urls"]) ? Cluster : Connection
     klass.new(config)
   end
