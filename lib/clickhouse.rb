@@ -1,6 +1,7 @@
 require "uri"
 require "forwardable"
 require "csv"
+require "json"
 
 require "faraday"
 require "pond"

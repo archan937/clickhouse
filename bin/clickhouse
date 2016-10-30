@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+require "clickhouse/cli"
+
+begin
+  Clickhouse::CLI.start
+rescue Interrupt
+end
