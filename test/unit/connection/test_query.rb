@@ -12,17 +12,19 @@ module Unit
       describe Clickhouse::Connection::Query do
         before do
           @connection = Connection.new
+          @connection.stubs(:parse_stats)
+          @connection.stubs(:write_log)
         end
 
         describe "#execute" do
           it "sends a POST request" do
-            @connection.expects(:post).with("sql", nil).returns(stub(:status => 200, :body => ""))
+            @connection.expects(:post).with("sql", nil).returns("")
             assert_equal true, @connection.execute("sql")
           end
 
           describe "when server returns a non-empty body" do
             it "returns the body of the response" do
-              @connection.expects(:post).with("sql", "body").returns(stub(:status => 200, :body => "Ok."))
+              @connection.expects(:post).with("sql", "body").returns("Ok.")
               assert_equal "Ok.", @connection.execute("sql", "body")
             end
           end
@@ -30,24 +32,24 @@ module Unit
 
         describe "#query" do
           it "sends a GET request requesting a TSV response including names and types" do
-            @connection.expects(:get).with("sql FORMAT JSONCompact").returns(stub(:status => 200, :body => ""))
-            @connection.stubs(:parse_response)
+            @connection.expects(:get).with("sql FORMAT JSONCompact")
+            @connection.stubs(:parse_data)
             assert_equal [], @connection.query("sql").to_a
           end
         end
 
         describe "#databases" do
           it "sends a 'SHOW DATABASES' query" do
-            @connection.expects(:get).with("SHOW DATABASES FORMAT JSONCompact").returns(stub(:status => 200, :body => "{}"))
-            @connection.stubs(:parse_response).returns([])
-            @connection.databases
+            @connection.expects(:get).with("SHOW DATABASES FORMAT JSONCompact")
+            @connection.stubs(:parse_data).returns([])
+            assert_equal [], @connection.databases
           end
         end
 
         describe "#tables" do
           it "sends a 'SHOW TABLES' query" do
-            @connection.expects(:get).with("SHOW TABLES FORMAT JSONCompact").returns(stub(:status => 200, :body => "{}"))
-            @connection.stubs(:parse_response).returns([])
+            @connection.expects(:get).with("SHOW TABLES FORMAT JSONCompact")
+            @connection.stubs(:parse_data).returns([])
             @connection.tables
           end
         end
@@ -65,7 +67,7 @@ CREATE TABLE logs_test (
 )
 ENGINE = MergeTree(date, 8192)
             SQL
-            @connection.expects(:post).with(sql.strip, nil).returns(stub(:status => 200, :body => ""))
+            @connection.expects(:post).with(sql.strip, nil).returns("")
             @connection.create_table("logs_test") do |t|
               t.uint8        :id
               t.float32      :price
@@ -80,8 +82,8 @@ ENGINE = MergeTree(date, 8192)
 
         describe "#describe_table" do
           it "sends a 'DESCRIBE TABLE <name>' query" do
-            @connection.expects(:get).with("DESCRIBE TABLE logs FORMAT JSONCompact").returns(stub(:status => 200, :body => ""))
-            @connection.stubs(:parse_response)
+            @connection.expects(:get).with("DESCRIBE TABLE logs FORMAT JSONCompact")
+            @connection.stubs(:parse_data)
             @connection.describe_table("logs")
           end
         end
@@ -89,7 +91,7 @@ ENGINE = MergeTree(date, 8192)
         describe "#rename_table" do
           describe "when passing an array with an even number of names" do
             it "sends a POST request containing a RENAME TABLE statement" do
-              @connection.expects(:post).with("RENAME TABLE foo TO bar, baz TO qux", nil).returns(stub(:status => 200, :body => "")).twice
+              @connection.expects(:post).with("RENAME TABLE foo TO bar, baz TO qux", nil).returns("").twice
               assert_equal true, @connection.rename_table("foo", "bar", "baz", "qux")
               assert_equal true, @connection.rename_table(["foo", "bar"], ["baz", "qux"])
             end
@@ -108,7 +110,7 @@ ENGINE = MergeTree(date, 8192)
 
           describe "when passing a hash" do
             it "sends a POST request containing a RENAME TABLE statement" do
-              @connection.expects(:post).with("RENAME TABLE foo TO bar, baz TO qux", nil).returns(stub(:status => 200, :body => ""))
+              @connection.expects(:post).with("RENAME TABLE foo TO bar, baz TO qux", nil).returns("")
               assert_equal true, @connection.rename_table(:foo => "bar", :baz => "qux")
             end
           end
@@ -116,7 +118,7 @@ ENGINE = MergeTree(date, 8192)
 
         describe "#drop_table" do
           it "sends a POST request containing a 'DROP TABLE' statement" do
-            @connection.expects(:post).with("DROP TABLE logs", nil).returns(stub(:status => 200, :body => ""))
+            @connection.expects(:post).with("DROP TABLE logs", nil).returns("")
             assert_equal true, @connection.drop_table("logs")
           end
         end
@@ -133,7 +135,7 @@ ENGINE = MergeTree(date, 8192)
 
           describe "when using hashes" do
             it "sends a POST request containing a 'INSERT INTO' statement using CSV" do
-              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns(stub(:status => 200, :body => ""))
+              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns("")
               assert_equal true, @connection.insert_rows("logs") { |rows|
                 rows << {:id => 12345, :first_name => "Paul", :last_name => "Engel"}
                 rows << {:id => 67890, :first_name => "Bruce", :last_name => "Wayne"}
@@ -143,7 +145,7 @@ ENGINE = MergeTree(date, 8192)
 
           describe "when using arrays" do
             it "sends a POST request containing a 'INSERT INTO' statement using CSV" do
-              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns(stub(:status => 200, :body => ""))
+              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns("")
               assert_equal true, @connection.insert_rows("logs", :names => %w(id first_name last_name)) { |rows|
                 rows << [12345, "Paul", "Engel"]
                 rows << [67890, "Bruce", "Wayne"]
@@ -167,8 +169,8 @@ ENGINE = MergeTree(date, 8192)
               }
             JAVASCRIPT
 
-            @connection.expects(:to_select_query).with(options = {:from => "logs"})
-            @connection.expects(:get).returns(stub(:body => body))
+            @connection.expects(:to_select_query).with(options = {:from => "logs"}).returns("")
+            @connection.expects(:get).returns(JSON.parse(body))
 
             assert_equal [
               [1982, "Paul"],
@@ -187,9 +189,9 @@ ENGINE = MergeTree(date, 8192)
         describe "#select_values" do
           describe "when empty result set" do
             it "returns an empty array" do
-              @connection.expects(:to_select_query)
+              @connection.expects(:to_select_query).returns("")
               @connection.expects(:get).returns(stub(:body => ""))
-              @connection.stubs(:parse_response).returns([])
+              @connection.stubs(:parse_data).returns([])
               assert_equal [], @connection.select_values({})
             end
           end
@@ -209,8 +211,8 @@ ENGINE = MergeTree(date, 8192)
                 }
               JAVASCRIPT
 
-              @connection.expects(:to_select_query)
-              @connection.expects(:get).returns(stub(:body => body))
+              @connection.expects(:to_select_query).returns("")
+              @connection.expects(:get).returns(JSON.parse(body))
               assert_equal [
                 1982,
                 1947

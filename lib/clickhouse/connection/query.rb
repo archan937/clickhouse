@@ -7,14 +7,14 @@ module Clickhouse
     module Query
 
       def execute(query, body = nil)
-        body = post(query, body).body.to_s
+        body = post(query, body)
         body.empty? ? true : body
       end
 
       def query(query)
-        query = query.to_s.gsub(/(;|\bFORMAT \w+)/i, "").strip
+        query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_response get(query).body.to_s
+        parse_data get(query)
       end
 
       def databases
@@ -37,11 +37,11 @@ module Clickhouse
         names = (args[0].is_a?(Hash) ? args[0].to_a : [args]).flatten
         raise Clickhouse::InvalidQueryError, "Odd number of table names" unless (names.size % 2) == 0
         names = Hash[*names].collect{|(from, to)| "#{from} TO #{to}"}
-        execute "RENAME TABLE #{names.join(", ")}"
+        execute("RENAME TABLE #{names.join(", ")}")
       end
 
       def drop_table(name)
-        execute "DROP TABLE #{name}"
+        execute("DROP TABLE #{name}")
       end
 
       def insert_rows(table, options = {})
@@ -49,7 +49,7 @@ module Clickhouse
           options[:rows] ||= yield([])
           generate_csv options[:rows], options[:names]
         end
-        execute "INSERT INTO #{table} FORMAT CSVWithNames", options[:csv]
+        execute("INSERT INTO #{table} FORMAT CSVWithNames", options[:csv])
       end
 
       def select_rows(options)
@@ -149,8 +149,7 @@ module Clickhouse
         end.flatten.join(" AND ")
       end
 
-      def parse_response(response)
-        data = JSON.parse response
+      def parse_data(data)
         names = data["meta"].collect{|column| column["name"]}
         types = data["meta"].collect{|column| column["type"]}
         ResultSet.new data["data"], names, types

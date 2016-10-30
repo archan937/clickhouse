@@ -4,9 +4,13 @@ require "csv"
 
 require "faraday"
 require "pond"
+require "active_support/dependencies/autoload"
+require "active_support/number_helper"
+require "active_support/core_ext/string/inflections"
 
 require "clickhouse/cluster"
 require "clickhouse/connection"
+require "clickhouse/utils"
 require "clickhouse/error"
 require "clickhouse/version"
 

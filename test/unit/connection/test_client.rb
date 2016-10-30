@@ -11,6 +11,8 @@ module Unit
       describe Clickhouse::Connection::Client do
         before do
           @connection = Connection.new
+          @connection.stubs(:parse_stats)
+          @connection.stubs(:write_log)
         end
 
         describe "#connect!" do
@@ -60,18 +62,18 @@ module Unit
         describe "#get" do
           it "sends a GET request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:get).with("/?query=foo", nil).returns(stub(:status => 200, :body => ""))
+            client.expects(:get).with("/?query=foo&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => ""))
             @connection.stubs(:log)
-            @connection.get(:foo)
+            @connection.get("foo")
           end
         end
 
         describe "#post" do
           it "sends a POST request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:post).with("/?query=foo", "body").returns(stub(:status => 200, :body => ""))
+            client.expects(:post).with("/?query=foo&output_format_write_statistics=1", "body").returns(stub(:status => 200, :body => ""))
             @connection.stubs(:log)
-            @connection.post(:foo, "body")
+            @connection.post("foo", "body")
           end
         end
 
@@ -89,14 +91,15 @@ module Unit
 
           it "queries the server returning the response" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:get).with("/?query=SELECT+1", nil).returns(response = stub(:status => 200, :body => ""))
-            assert_equal response, @connection.send(:request, :get, "SELECT 1")
+            client.expects(:get).with("/?query=SELECT+1&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => ""))
+            @connection.expects(:parse_body).returns(data = mock)
+            assert_equal data, @connection.send(:request, :get, "SELECT 1")
           end
 
           describe "when not receiving status 200" do
             it "raises a Clickhouse::QueryError" do
               @connection.instance_variable_set :@client, (client = mock)
-              client.expects(:get).with("/?query=SELECT+1", nil).returns(stub(:status => 500, :body => ""))
+              client.expects(:get).with("/?query=SELECT+1&output_format_write_statistics=1", nil).returns(stub(:status => 500, :body => ""))
               assert_raises Clickhouse::QueryError do
                 @connection.send(:request, :get, "SELECT 1")
               end
@@ -112,16 +115,25 @@ module Unit
               end
             end
           end
+
+          it "parses the body" do
+            json = <<-JSON
+              {"meta": []}
+            JSON
+            @connection.instance_variable_set :@client, (client = mock)
+            client.expects(:get).with("/?query=SELECT+1+FORMAT+JSONCompact&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => json))
+            assert_equal({"meta" => []}, @connection.send(:request, :get, "SELECT 1 FORMAT JSONCompact"))
+          end
         end
 
         describe "configuration" do
           describe "database" do
             it "includes the database in the querystring" do
-              @connection.expects(:log)
               @connection.instance_variable_get(:@config)[:database] = "system"
               @connection.instance_variable_set(:@client, (client = mock))
-              client.expects(:get).with("/?database=system&query=SELECT+1", nil).returns(response = stub(:status => 200, :body => ""))
-              assert_equal response, @connection.send(:request, :get, "SELECT 1")
+              client.expects(:get).with("/?database=system&query=SELECT+1&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => ""))
+              @connection.expects(:parse_body).returns(data = mock)
+              assert_equal data, @connection.send(:request, :get, "SELECT 1")
             end
           end
 
@@ -131,6 +143,59 @@ module Unit
               connection = Clickhouse::Connection.new :password => "awesomepassword"
               connection.connect!
               assert_equal "Basic ZGVmYXVsdDphd2Vzb21lcGFzc3dvcmQ=", connection.send(:client).headers["Authorization"].force_encoding("UTF-8")
+            end
+          end
+        end
+
+        describe "statistics" do
+          before do
+            @connection = Connection.new
+            @json = <<-JSON
+              {
+                "rows": 1947,
+                "statistics": {
+                  "elapsed": 0.1882,
+                  "rows_read": 1982,
+                  "bytes_read": 2003
+                }
+              }
+            JSON
+          end
+
+          it "parses the statistics" do
+            @connection.stubs(:log)
+            @connection.instance_variable_set :@client, (client = mock)
+            Time.expects(:now).returns(1882).twice
+
+            client.expects(:get).with("/?query=SELECT+1+FORMAT+JSONCompact&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => @json))
+            @connection.expects(:write_log).with(
+              0, "SELECT 1", {
+                "elapsed" => "188.2ms",
+                "rows_read" => "1.98 thousand",
+                "bytes_read" => 2003,
+                "rows" => 1947,
+                "rows_per_second" => "10.53 thousand",
+                "data_per_second" => "10.39 KB",
+                "data_read" => "1.96 KB"
+              }
+            )
+            @connection.send(:request, :get, "SELECT 1 FORMAT JSONCompact")
+          end
+
+          it "write the expected logs" do
+            @connection.instance_variable_set :@client, (client = mock)
+            Time.expects(:now).returns(1882).twice
+
+            client.expects(:get).with("/?query=SELECT+1+FORMAT+JSONCompact&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => @json))
+            log = "\n \e[1m\e[35mSQL (0.0ms)\e\e[0m  SELECT 1;\e\n  \e[1m\e[36m1947 rows in set. Elapsed: 188.2ms. Processed: 1.98 thousand rows, 1.96 KB (10.53 thousand rows/s, 10.39 KB/s)\e[0m "
+
+            @connection.expects(:log).with(:info, log)
+            @connection.send(:request, :get, "SELECT 1 FORMAT JSONCompact")
+          end
+
+          describe "#number_to_human_duration" do
+            it "returns in seconds when more than 1 seconds" do
+              assert_equal "2.0s", @connection.send(:number_to_human_duration, 2)
             end
           end
         end
