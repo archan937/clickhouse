@@ -8,12 +8,13 @@ module Clickhouse
     DEFAULT_URLS = "http://localhost:8123"
 
     desc "server", "Start a Sinatra server as a ClickHouse client"
-    method_options [:port, "-p"] => 1982
+    method_options [:port, "-p"] => 1982, [:username, "-u"] => :string, [:password, "-P"] => :string
     def server(urls = DEFAULT_URLS)
       run! :server, urls, options
     end
 
     desc "console", "Start a Pry console as a ClickHouse client"
+    method_options [:username, "-u"] => :string, [:password, "-P"] => :string
     def console(urls = DEFAULT_URLS)
       run! :console, urls, options
     end
@@ -26,7 +27,7 @@ module Clickhouse
     def run!(const, urls, options)
       require! DEPENDENCIES[const]
       require_relative "cli/#{const}"
-      connect! urls
+      connect! options.merge(:urls => urls)
       self.class.const_get(const.to_s.capitalize).run!(options)
     end
 
