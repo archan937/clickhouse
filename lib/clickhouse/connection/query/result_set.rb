@@ -8,7 +8,7 @@ module Clickhouse
         def_delegators :@rows, :size, :empty?
         def_delegators :to_a, :first, :last, :flatten
 
-        attr_reader :names
+        attr_reader :names, :types
 
         def initialize(rows = [], names = nil, types = nil)
           @rows = rows
