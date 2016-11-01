@@ -67,7 +67,7 @@ module Clickhouse
         stats = parse_stats(response)
 
         write_log duration, query, stats
-        raise QueryError, "Got status #{status} (expected 200)" unless status == 200
+        raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
         response
 
       rescue Faraday::Error => e
@@ -77,10 +77,9 @@ module Clickhouse
       def parse_body(format, body)
         case format
         when "JSON", "JSONCompact"
-          JSON.parse(body)
-        else
-          body
+          body = JSON.parse(body) if body.strip[0] == "{"
         end
+        body
       end
 
       def parse_stats(response)
