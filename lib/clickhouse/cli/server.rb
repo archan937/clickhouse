@@ -1,9 +1,14 @@
+require "tilt/erubis"
+
 module Clickhouse
   class CLI < Thor
     class Server < Sinatra::Base
 
+      set :views, File.expand_path("../server/views", __FILE__)
+      set :public_folder, File.expand_path("../server/assets", __FILE__)
+
       get "/" do
-        "Welcome to the Clickhouse client"
+        erb :index
       end
 
     end
