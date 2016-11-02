@@ -129,7 +129,7 @@ module Clickhouse
       def self.interpolate_patterns(sql, replaced)
         matched = false
 
-        sql = sql.gsub(/($|%)\{(\d+)\}/) do |match|
+        sql = sql.gsub(/(\$|%)\{(\d+)\}/) do |match|
           matched = true
           replaced[$1.to_i]
         end
