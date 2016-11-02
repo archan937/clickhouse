@@ -174,7 +174,7 @@ module Clickhouse
             end
           end
         else
-          puts result == true ? "Ok." : result
+          puts result == true ? "Ok." : (result || "Fail.")
         end
 
         if @log
