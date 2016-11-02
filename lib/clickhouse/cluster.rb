@@ -6,6 +6,7 @@ module Clickhouse
     def initialize(config)
       config = config.dup
       urls = config.delete(:urls) || config.delete("urls")
+      urls.collect!{|url| ::Clickhouse::Utils.normalize_url(url)}
 
       @pond = ::Pond.new :maximum_size => urls.size, :timeout => 0.1
       block = ::Proc.new do

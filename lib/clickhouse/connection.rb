@@ -28,8 +28,7 @@ module Clickhouse
       end
 
       if url = config[:url]
-        url = "#{DEFAULT_CONFIG[:scheme]}://#{url}" unless url.match(/^\w+:\/\//)
-        uri = URI url
+        uri = URI Clickhouse::Utils.normalize_url(url)
         config[:scheme] = uri.scheme
         config[:host] = uri.host
         config[:port] = uri.port

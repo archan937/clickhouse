@@ -4,6 +4,20 @@ module Unit
   class TestUtils < MiniTest::Test
 
     describe Clickhouse::Utils do
+      describe ".normalize_url" do
+        describe "when passing scheme" do
+          it "returns the passed url" do
+            assert_equal "paul://engel", Clickhouse::Utils.normalize_url("paul://engel")
+          end
+        end
+
+        describe "when not passing scheme" do
+          it "prepends the default scheme" do
+            assert_equal "http://engel", Clickhouse::Utils.normalize_config("engel")
+          end
+        end
+      end
+
       describe ".extract_format" do
         describe "when not having a format" do
           it "returns the query and nil as format" do
