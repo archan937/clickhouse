@@ -150,27 +150,28 @@ module Clickhouse
         puts "ERROR: #{e.message}"
       end
 
-      def self.print_result(result_set)
-        array = [result_set.names].concat(result_set.to_a)
-
-        lengths = array.inject([]) do |lengths, row|
-          row.each_with_index do |value, index|
-            length = value.to_s.strip.length
-            lengths[index] = [lengths[index].to_i, length].max
+      def self.print_result(result)
+        if result.is_a?(Clickhouse::Connection::Query::ResultSet)
+          array = [result.names].concat(result.to_a)
+          lengths = array.inject([]) do |lengths, row|
+            row.each_with_index do |value, index|
+              length = value.to_s.strip.length
+              lengths[index] = [lengths[index].to_i, length].max
+            end
+            lengths
           end
-          lengths
-        end
-
-        puts
-
-        array.each_with_index do |row, i|
-          values = [nil]
-          lengths.each_with_index do |length, index|
-            values << row[index].to_s.ljust(length, " ")
+          puts
+          array.each_with_index do |row, i|
+            values = [nil]
+            lengths.each_with_index do |length, index|
+              values << row[index].to_s.ljust(length, " ")
+            end
+            values << nil
+            separator = (i == 0) ? "+" : "|"
+            puts values.join(" #{separator} ")
           end
-          values << nil
-          separator = (i == 0) ? "+" : "|"
-          puts values.join(" #{separator} ")
+        else
+          puts result == true ? "Ok." : result
         end
 
         if @log
