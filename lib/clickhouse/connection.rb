@@ -27,15 +27,16 @@ module Clickhouse
         hash
       end
 
-      if config[:url]
-        uri = URI config[:url]
+      if url = config[:url]
+        url = "#{DEFAULT_CONFIG[:scheme]}://#{url}" unless url.match(/^\w+:\/\//)
+        uri = URI url
         config[:scheme] = uri.scheme
         config[:host] = uri.host
         config[:port] = uri.port
         config.delete(:url)
       end
 
-      DEFAULT_CONFIG.merge(config)
+      DEFAULT_CONFIG.merge(config.reject{|k, v| v.nil?})
     end
 
   end

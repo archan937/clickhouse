@@ -27,8 +27,8 @@ module Clickhouse
     def run!(const, urls, options)
       require! DEPENDENCIES[const]
       require_relative "cli/#{const}"
-      connect! options.merge(:urls => urls)
-      self.class.const_get(const.to_s.capitalize).run!(options)
+      connect! urls, options
+      self.class.const_get(const.to_s.capitalize).run!(:port => options["port"])
     end
 
     def require!(name)
@@ -38,8 +38,9 @@ module Clickhouse
       exit!
     end
 
-    def connect!(urls)
-      Clickhouse.establish_connection :urls => urls.split(",")
+    def connect!(urls, options)
+      config = options.merge(:urls => urls.split(",")).inject({}){|h, (k, v)| h[k.to_sym] = v; h}
+      Clickhouse.establish_connection config
     end
 
     def method_missing(method, *args)
