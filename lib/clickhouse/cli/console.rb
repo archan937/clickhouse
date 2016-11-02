@@ -26,11 +26,12 @@ module Clickhouse
       end
 
       def self.alter_history(sql)
-        Readline::HISTORY.pop
-        Readline::HISTORY.to_a.count{|line| line[-1] != ";"}.times do
+        (Readline::HISTORY.to_a.count{|line| line[-1] != ";"} + 1).times do
           Readline::HISTORY.pop
         end
-        Readline::HISTORY.push(sql)
+        unless Readline::HISTORY.to_a[-1] == sql
+          Readline::HISTORY.push(sql)
+        end
       end
 
       def self.dump_history
