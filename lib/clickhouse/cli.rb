@@ -1,4 +1,5 @@
 require "thor"
+require "launchy"
 require "clickhouse"
 
 module Clickhouse
@@ -10,7 +11,9 @@ module Clickhouse
     desc "server", "Start a Sinatra server as a ClickHouse client"
     method_options [:port, "-p"] => 1982, [:username, "-u"] => :string, [:password, "-P"] => :string
     def server(urls = DEFAULT_URLS)
-      run! :server, urls, options
+      run! :server, urls, options do
+        Launchy.open "http://localhost:#{options[:port]}"
+      end
     end
 
     desc "console", "Start a Pry console as a ClickHouse client"
@@ -24,11 +27,12 @@ module Clickhouse
 
   private
 
-    def run!(const, urls, options)
+    def run!(const, urls, options, &block)
       require! DEPENDENCIES[const]
+      require_relative "cli/client"
       require_relative "cli/#{const}"
       connect! urls, options
-      self.class.const_get(const.to_s.capitalize).run!(:port => options["port"])
+      self.class.const_get(const.to_s.capitalize).run!(:port => options["port"], &block)
     end
 
     def require!(name)

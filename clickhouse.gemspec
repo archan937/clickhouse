@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "pond"
   gem.add_dependency "activesupport", ">= 4.1.8"
   gem.add_dependency "thor"
+  gem.add_dependency "launchy"
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "pry"

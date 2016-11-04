@@ -13,7 +13,7 @@ module Unit
         it "does not modify the passed config" do
           config = {:urls => %w(localhost:1234 localhost:1235 localhost:1236)}
           Clickhouse::Cluster.new config
-          assert_equal({:urls => %w(localhost:1234 localhost:1235 localhost:1236)}, config)
+          assert_equal({:urls => %w(http://localhost:1234 http://localhost:1235 http://localhost:1236)}, config)
         end
 
         describe "when connection succeeds" do

@@ -13,7 +13,7 @@ module Unit
 
         describe "when not passing scheme" do
           it "prepends the default scheme" do
-            assert_equal "http://engel", Clickhouse::Utils.normalize_config("engel")
+            assert_equal "http://engel", Clickhouse::Utils.normalize_url("engel")
           end
         end
       end

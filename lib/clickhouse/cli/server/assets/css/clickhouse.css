@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css?family=Inconsolata|Open+Sans');
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.2rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1.1rem;
+}
+
+h6 {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.header {
+  padding: 5px 17px;
+  background: #F3F3F3;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.container {
+  width: calc(100% - 36px);
+  max-width: inherit;
+}
+
+form {
+  margin-bottom: 7px;
+}
+
+textarea {
+  opacity: 0;
+}
+
+textarea, .CodeMirror {
+  margin-bottom: 1.3em;
+  width: 100%;
+  height: 11.75em;
+  display: block;
+  font-family: 'Inconsolata';
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  border: 1px solid #DDD;
+}
+
+input[type="submit"] {
+  height: 30px;
+  padding: 0 17px 0 20px;
+  color: white;
+  font-size: 10px;
+  line-height: 28px;
+  letter-spacing: .05rem;
+  background: #D74D2F;
+  border-color: #D74D2F;
+  border-radius: 0;
+}
+
+input[type="submit"]:hover, input[type="submit"]:focus {
+  color: white;
+  border-color: #B30015;
+}
+
+#stats {
+  padding-left: 1.5rem;
+}
+
+#result_wrapper {
+  margin-bottom: 10px;
+  padding-top: 18px;
+  overflow-x: auto;
+  border-top: 1px solid #DDD;
+}
+
+#result_filter {
+  float: left;
+}
+
+#result_filter label {
+  padding-left: 1px;
+  font-family: 'Helvetica Neue', 'Arial';
+  font-weight: bold;
+}
+
+#result_filter input[type="search"] {
+  width: 300px;
+  height: 28px;
+  margin-left: 12px;
+  margin-bottom: 12px;
+  padding: 6px 7px;
+  font-weight: normal;
+  border-radius: 0;
+}
+
+#result_filter input[type="search"]:focus {
+  border-color: #999;
+}
+
+#result {
+  width: 100%;
+  margin-bottom: 15px;
+  font-family: 'Helvetica Neue', 'Arial';
+  font-size: 1.25rem;
+  border: 0;
+  border-top: 2px solid #111;
+  border-left: 1px solid #DDD;
+}
+
+#result th, #result td {
+  padding: 4px 8px;
+  border: 0;
+  border-right: 1px solid #DDD;
+  border-bottom: 1px solid #DDD;
+}
+
+#result th {
+  background: #EEE;
+}
+
+#result td {
+  white-space: nowrap;
+}
+
+#result td.odd {
+  background: #DDD;
+}
+
+#result td.even {
+  background: #FFF;
+}
+
+#result_info {
+  height: 3px;
+  display: none;
+}
