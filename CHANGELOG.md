@@ -1,5 +1,11 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.5 (November 4, 2016)
+
+* Added command line interface `clickhouse c`
+* Being able to start a Sinatra based Clickhouse client using `clickhouse s`
+* Using :debug to log queries
+
 ### Version 0.1.4 (October 25, 2016)
 
 * Ensured that Clickhouse does not modify the passed cluster config
