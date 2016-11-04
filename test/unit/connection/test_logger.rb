@@ -16,15 +16,15 @@ module Unit
         describe "#log" do
           describe "when having specified a logger" do
             it "delegates to logger" do
-              (logger = mock).expects(:info, "Hello world!")
+              (logger = mock).expects(:debug, "Hello world!")
               Clickhouse.expects(:logger).returns(logger).twice
-              @connection.send(:log, :info, "Hello world!")
+              @connection.send(:log, :debug, "Hello world!")
             end
           end
 
           describe "when not having specified a logger" do
             it "does nothing" do
-              assert_nil @connection.send(:log, :info, "Boo!")
+              assert_nil @connection.send(:log, :debug, "Boo!")
             end
           end
         end

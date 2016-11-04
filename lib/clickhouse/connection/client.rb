@@ -118,7 +118,7 @@ module Clickhouse
         line1 = "\n \e[1m[35mSQL (#{duration})\e[0m  #{query};"
         line2 = "\n  \e[1m[36m#{rows} #{"row".pluralize(rows)} in set. Elapsed: #{elapsed}. Processed: #{rows_read} rows, #{data_read} (#{rows_per_second} rows/s, #{data_per_second}/s)\e[0m" if rows
 
-        log :info, "#{line1}#{line2} "
+        log :debug, "#{line1}#{line2} "
       end
 
       def number_to_human_duration(number)

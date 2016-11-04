@@ -189,7 +189,7 @@ module Unit
             client.expects(:get).with("/?query=SELECT+1+FORMAT+JSONCompact&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => @json))
             log = "\n \e[1m\e[35mSQL (0.0ms)\e\e[0m  SELECT 1;\e\n  \e[1m\e[36m1947 rows in set. Elapsed: 188.2ms. Processed: 1.98 thousand rows, 1.96 KB (10.53 thousand rows/s, 10.39 KB/s)\e[0m "
 
-            @connection.expects(:log).with(:info, log)
+            @connection.expects(:log).with(:debug, log)
             @connection.send(:request, :get, "SELECT 1 FORMAT JSONCompact")
           end
 
