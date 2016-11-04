@@ -25,6 +25,18 @@ h6 {
   max-width: inherit;
 }
 
+small {
+  font-size: 1.2rem;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 form {
   margin-bottom: 7px;
 }

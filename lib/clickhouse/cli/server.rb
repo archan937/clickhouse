@@ -18,6 +18,7 @@ module Clickhouse
         execute(sql) do |result, log|
           content_type :json
           {
+            :urls => Clickhouse.connection.pond.available.collect(&:url),
             :history => Readline::HISTORY.to_a,
             :names => result.names,
             :data => result.to_a,
