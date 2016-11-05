@@ -4,8 +4,8 @@ require File.expand_path("../lib/clickhouse/version", __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Paul Engel"]
   gem.email         = ["pm_engel@icloud.com"]
-  gem.summary       = %q{A Ruby database driver for ClickHouse}
-  gem.description   = %q{A Ruby database driver for ClickHouse}
+  gem.summary       = %q{A Ruby database driver for ClickHouse (also Clickhouse CLI and web GUI included)}
+  gem.description   = %q{A Ruby database driver for ClickHouse (also Clickhouse CLI and web GUI included)}
   gem.homepage      = "https://github.com/archan937/clickhouse"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "clickhouse"
   gem.require_paths = ["lib"]
   gem.version       = Clickhouse::VERSION
+  gem.licenses      = ["MIT"]
 
   gem.add_dependency "bundler", ">= 1.13.4"
   gem.add_dependency "faraday"

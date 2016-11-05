@@ -1,5 +1,11 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.6 (November 5, 2016)
+
+* Improved clickhouse console and server
+* Using Bundler >= 1.13.4
+* Changed cluster timeout to 5 seconds
+
 ### Version 0.1.5 (November 4, 2016)
 
 * Added command line interface `clickhouse c`
