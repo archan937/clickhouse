@@ -14,16 +14,20 @@ module Clickhouse
 
       post "/" do
         sql = prettify(params[:sql]).gsub(/\s+;$/, ";")
-        alter_history(sql)
-        execute(sql) do |result, log|
-          content_type :json
-          {
-            :urls => Clickhouse.connection.pond.available.collect(&:url),
-            :history => Readline::HISTORY.to_a,
-            :names => result.names,
-            :data => result.to_a,
-            :stats => log.sub("\e[1m\e[36m", "").sub("\e[0m", "").strip
-          }.to_json
+        alter_history(sql, false)
+        begin
+          execute(sql) do |result, log|
+            content_type :json
+            {
+              :urls => Clickhouse.connection.pond.available.collect(&:url),
+              :history => Readline::HISTORY.to_a.collect(&:strip),
+              :names => result.names,
+              :data => result.to_a,
+              :stats => log.sub("\e[1m\e[36m", "").sub("\e[0m", "").strip
+            }.to_json
+          end
+        rescue Clickhouse::Error => e
+          halt 500, e.message
         end
       end
 

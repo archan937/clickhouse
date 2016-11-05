@@ -27,8 +27,8 @@ module Clickhouse
         end if File.exists?(HISTORY_FILE)
       end
 
-      def alter_history(sql)
-        (Readline::HISTORY.to_a.count{|line| line[-1] != ";"} + 1).times do
+      def alter_history(sql, current = true)
+        (Readline::HISTORY.to_a.count{|line| line[-1] != ";"} + (current ? 1 : 0)).times do
           Readline::HISTORY.pop
         end
         unless Readline::HISTORY.to_a[-1] == sql
@@ -142,8 +142,6 @@ module Clickhouse
         else
           sql
         end
-      rescue Clickhouse::Error => e
-        puts "ERROR: #{e.message}"
       end
 
     end

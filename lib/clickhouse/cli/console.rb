@@ -19,12 +19,20 @@ module Clickhouse
         line = Readline.readline(prompt, true)
 
         exit! unless line && !%w(exit quit).include?(line = line.strip)
+
         line = prettify(line)
         sql = [buffer, line].compact.join("\n").gsub(/\s+;$/, ";")
-        puts "#{CLR}#{prompt}#{line}"
 
+        puts "#{CLR}#{prompt}#{line}"
         alter_history(sql)
-        readline execute(sql)
+
+        buffer = begin
+          execute(sql)
+        rescue Clickhouse::Error => e
+          puts "ERROR: #{e.message}"
+        end
+
+        readline buffer
       end
 
       def process_result(result, log)

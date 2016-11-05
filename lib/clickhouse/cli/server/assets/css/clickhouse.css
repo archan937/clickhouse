@@ -25,6 +25,10 @@ h6 {
   max-width: inherit;
 }
 
+.not_connected {
+  color: #D74D2F;
+}
+
 small {
   font-size: 1.2rem;
 }
@@ -58,21 +62,42 @@ textarea, .CodeMirror {
   border: 1px solid #DDD;
 }
 
-input[type="submit"] {
+input[type="submit"], a.download {
   height: 30px;
+  margin-right: 4px;
   padding: 0 17px 0 20px;
   color: white;
   font-size: 10px;
   line-height: 28px;
   letter-spacing: .05rem;
+  border-radius: 0;
+}
+
+input[type="submit"] {
   background: #D74D2F;
   border-color: #D74D2F;
-  border-radius: 0;
+}
+
+a.download {
+  background: #999;
+  border-color: #999;
 }
 
 input[type="submit"]:hover, input[type="submit"]:focus {
   color: white;
   border-color: #B30015;
+}
+
+a.download:hover, a.download:focus {
+  color: white;
+  text-decoration: none;
+}
+
+input[disabled="disabled"],a[disabled="disabled"] {
+  color: #F9F9F9;
+  cursor: default !important;
+  background: #E4E4E4;
+  border-color: #E7E7E7 !important;
 }
 
 #stats {
@@ -111,10 +136,13 @@ input[type="submit"]:hover, input[type="submit"]:focus {
 }
 
 #result {
-  width: 100%;
+  width: 100% !important;
   margin-bottom: 15px;
   font-family: 'Helvetica Neue', 'Arial';
   font-size: 1.25rem;
+}
+
+table#result {
   border: 0;
   border-top: 2px solid #111;
   border-left: 1px solid #DDD;
