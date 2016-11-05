@@ -15,6 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Clickhouse::VERSION
 
+  gem.add_dependency "bundler", ">= 1.13.4"
   gem.add_dependency "faraday"
   gem.add_dependency "pond"
   gem.add_dependency "activesupport", ">= 4.1.8"
