@@ -27,15 +27,15 @@ module Clickhouse
         hash
       end
 
-      if url = config[:url]
-        uri = URI Clickhouse::Utils.normalize_url(url)
+      if config[:url]
+        uri = URI Clickhouse::Utils.normalize_url(config[:url])
         config[:scheme] = uri.scheme
         config[:host] = uri.host
         config[:port] = uri.port
         config.delete(:url)
       end
 
-      DEFAULT_CONFIG.merge(config.reject{|k, v| v.nil?})
+      DEFAULT_CONFIG.merge(config.reject{|_k, v| v.nil?})
     end
 
   end

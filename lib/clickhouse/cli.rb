@@ -47,7 +47,7 @@ module Clickhouse
       Clickhouse.establish_connection config
     end
 
-    def method_missing(method, *args)
+    def method_missing(method, *_args)
       raise Error, "Unrecognized command \"#{method}\". Please consult `clickhouse help`."
     end
 
