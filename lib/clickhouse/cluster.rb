@@ -8,7 +8,7 @@ module Clickhouse
       urls = config.delete(:urls) || config.delete("urls")
       urls.collect!{|url| ::Clickhouse::Utils.normalize_url(url)}
 
-      @pond = ::Pond.new :maximum_size => urls.size, :timeout => 0.1
+      @pond = ::Pond.new :maximum_size => urls.size, :timeout => 5.0
       block = ::Proc.new do
         url = (urls - pond.available.collect(&:url)).first || urls.sample
         ::Clickhouse::Connection.new(config.merge(:url => url))
