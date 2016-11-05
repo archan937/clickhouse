@@ -85,7 +85,7 @@ module Clickhouse
       def parse_stats(response)
         return {} unless response.is_a?(Hash)
 
-        options = {:precision => 2, :significant => false}
+        options = {:locale => :en, :precision => 2, :significant => false}
         stats = response["statistics"].merge("rows" => response["rows"])
         factor = 1 / stats["elapsed"]
 
