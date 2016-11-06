@@ -8,7 +8,7 @@ module Clickhouse
     DEPENDENCIES = {:server => "sinatra"}
     DEFAULT_URLS = "http://localhost:8123"
 
-    desc "server", "Start a Sinatra server as a ClickHouse client"
+    desc "server [HOSTS]", "Start a Sinatra server as ClickHouse client (HOSTS should be comma separated URIs)"
     method_options [:port, "-p"] => 1982, [:username, "-u"] => :string, [:password, "-P"] => :string
     def server(urls = DEFAULT_URLS)
       run! :server, urls, options do
@@ -16,7 +16,7 @@ module Clickhouse
       end
     end
 
-    desc "console", "Start a Pry console as a ClickHouse client"
+    desc "console [HOSTS]", "Start a Pry console as ClickHouse client (HOSTS should be comma separated URIs)"
     method_options [:username, "-u"] => :string, [:password, "-P"] => :string
     def console(urls = DEFAULT_URLS)
       run! :console, urls, options
