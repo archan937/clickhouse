@@ -179,6 +179,33 @@ If all the connections failed, it will just return `nil`.
 
 To see what more the `Clickhouse` gem has to offer, please take a look at the unit tests ( [test/unit/connection/test_query.rb](https://github.com/archan937/clickhouse/blob/master/test/unit/connection/test_query.rb) for instance).
 
+## Using the Sinatra-based browser GUI and Pry-based CLI
+
+As of `Clickhouse v0.1.7`, the gem is provided with both a Sinatra-based GUI and a Pry-based CLI. Starting either of them is very easy:
+
+* `clickhouse s localhost:8123` - (the `s` stands for server as we know from `rails s`)
+* `clickhouse c localhost:8123` - (the `c` stands for console as we know from `rails c`)
+
+Multiple connections should be passed comma separated:
+
+`clickhouse s https://myserver.com:8123,https://myserver.com:8124`
+
+Use `clickhouse help` to:
+
+```
+$ clickhouse help server
+Usage:
+  clickhouse server [HOSTS]
+
+Options:
+  -p, [--port=N]
+                             # Default: 1982
+  -u, [--username=USERNAME]
+  -P, [--password=PASSWORD]
+
+Start a Sinatra server as ClickHouse client (HOSTS should be comma separated URIs)
+```
+
 ## Using the console
 
 As you probably already noticed, the `Clickhouse` repo is provided with a `script/console` file which you can use for development / testing purposes. Please note that you need to have a ClickHouse server running.

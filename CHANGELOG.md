@@ -1,5 +1,10 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.7 (November 6, 2016)
+
+* Corrected interpolating nested patterns
+* Only upcasing whole (preserved) words
+
 ### Version 0.1.6 (November 5, 2016)
 
 * Improved clickhouse console and server
