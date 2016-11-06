@@ -122,7 +122,7 @@ module Clickhouse
 
         sql = sql.gsub(/(\$|%)\{(\d+)\}/) do |match|
           matched = true
-          replaced[$1.to_i]
+          replaced[$2.to_i]
         end
 
         matched ? interpolate_patterns(sql, replaced) : sql
