@@ -93,8 +93,8 @@ module Clickhouse
           TOTALS
         ).sort{|a, b| [b.size, a] <=> [a.size, b]}
 
-        sql.gsub!(/(#{preserved_words.join("|")})/i) do |match|
-          match.upcase
+        sql.gsub!(/(\b)(#{preserved_words.join("|")})(\b)/i) do
+          "#{$1}#{$2.upcase}#{$3}"
         end
 
         interpolate_patterns(sql, replaced)
