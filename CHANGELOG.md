@@ -1,17 +1,21 @@
 ## Clickhouse CHANGELOG
 
-### Version 0.1.7 (November 6, 2016)
+### Version 0.1.8 (November 6, 2016)
+
+* Fixed loading URLs in GUI
+
+### Version 0.1.7 (November 6, 2016) [YANKED]
 
 * Corrected interpolating nested patterns
 * Only upcasing whole (preserved) words
 
-### Version 0.1.6 (November 5, 2016)
+### Version 0.1.6 (November 5, 2016) [YANKED]
 
 * Improved clickhouse console and server
 * Using Bundler >= 1.13.4
 * Changed cluster timeout to 5 seconds
 
-### Version 0.1.5 (November 4, 2016)
+### Version 0.1.5 (November 4, 2016) [YANKED]
 
 * Added command line interface `clickhouse c`
 * Being able to start a Sinatra based Clickhouse client using `clickhouse s`
