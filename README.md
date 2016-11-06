@@ -10,6 +10,8 @@ A Ruby database driver for ClickHouse (also Clickhouse CLI and web GUI included)
 
 On June 15th 2016, [Yandex open-sourced their awesome project](https://news.ycombinator.com/item?id=11908254) giving the community a [powerful asset](https://clickhouse.yandex/benchmark.html) which can compete with the big players like [Google BigQuery](https://cloud.google.com/bigquery/) and [Amazon Redshift](http://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html) with an important advantage: the client can use ClickHouse in its infrastructure and does not have to pay for the cloud ([read more](https://translate.google.com/translate?sl=ru&tl=en&js=y&prev=_t&hl=en&ie=UTF-8&u=https://habrahabr.ru/company/yandex/blog/303282/)).
 
+![Using the Sinatra-based Clickhouse client web GUI](http://res.cloudinary.com/archan937/video/upload/c_scale,q_100,vc_h264:high,w_800/v1478425941/clickhouse.gif)
+
 ### Why use the HTTP interface and not the TCP interface?
 
 Well, the developers of ClickHouse themselves [discourage](https://github.com/yandex/ClickHouse/issues/45#issuecomment-231194134) using the TCP interface.
@@ -179,9 +181,9 @@ If all the connections failed, it will just return `nil`.
 
 To see what more the `Clickhouse` gem has to offer, please take a look at the unit tests ( [test/unit/connection/test_query.rb](https://github.com/archan937/clickhouse/blob/master/test/unit/connection/test_query.rb) for instance).
 
-## Using the Sinatra-based browser GUI and Pry-based CLI
+## Using the Sinatra-based browser GUI and Thor-based CLI
 
-As of `Clickhouse v0.1.7`, the gem is provided with both a Sinatra-based GUI and a Pry-based CLI. Starting either of them is very easy:
+As of `Clickhouse v0.1.8`, the gem is provided with both a Sinatra-based GUI and a Thor-based CLI. Starting either of them is very easy:
 
 * `clickhouse s localhost:8123` - (the `s` stands for server as we know from `rails s`)
 * `clickhouse c localhost:8123` - (the `c` stands for console as we know from `rails c`)
