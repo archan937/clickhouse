@@ -1,5 +1,9 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.9 (December 9, 2016)
+
+* Added gem dependencies `sinatra` and `erubis` because excluding on purpose them did not really make sense
+
 ### Version 0.1.8 (November 6, 2016)
 
 * Fixed loading URLs in GUI
