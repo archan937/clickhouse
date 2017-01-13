@@ -1,5 +1,9 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.10 (January 13, 2017)
+
+* Fixed `erubis` dependency once and for all
+
 ### Version 0.1.9 (December 9, 2016)
 
 * Added gem dependencies `sinatra` and `erubis` because excluding on purpose them did not really make sense
