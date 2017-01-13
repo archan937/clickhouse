@@ -1,4 +1,5 @@
-require "tilt/erubis"
+require "sinatra"
+require "erubis"
 
 module Clickhouse
   class CLI < Thor

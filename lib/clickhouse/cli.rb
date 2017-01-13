@@ -5,7 +5,6 @@ require "clickhouse"
 module Clickhouse
   class CLI < Thor
 
-    DEPENDENCIES = {:server => "sinatra"}
     DEFAULT_URLS = "http://localhost:8123"
 
     desc "server [HOSTS]", "Start a Sinatra server as ClickHouse client (HOSTS should be comma separated URIs)"
@@ -28,18 +27,10 @@ module Clickhouse
   private
 
     def run!(const, urls, options, &block)
-      require! DEPENDENCIES[const]
       require_relative "cli/client"
       require_relative "cli/#{const}"
       connect! urls, options
       self.class.const_get(const.to_s.capitalize).run!(:port => options["port"], &block)
-    end
-
-    def require!(name)
-      require(name) if name
-    rescue LoadError
-      puts "fatal: #{name.capitalize} not available. Please run `gem install #{name}` first."
-      exit!
     end
 
     def connect!(urls, options)
