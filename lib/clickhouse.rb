@@ -2,6 +2,7 @@ require "uri"
 require "forwardable"
 require "csv"
 require "json"
+require "time"
 
 require "faraday"
 require "pond"
