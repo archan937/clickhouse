@@ -188,6 +188,115 @@ module Unit
               end
             end
           end
+
+          describe 'Nullable Integer' do
+            before do
+              @result_set = Clickhouse::Connection::Query::ResultSet.new(
+                  [
+                      [nil, nil, nil, nil, nil, nil, nil],
+                      [1, 1, 1, 1, 1, 1, 1]
+                  ],
+                  [
+                      "column_uint8",
+                      "column_uint16",
+                      "column_uint32",
+                      "column_uint64",
+                      "column_int8",
+                      "column_int16",
+                      "column_int32",
+                      "column_int64"
+                  ],
+                  [
+                      "Nullable(UInt8)",
+                      "Nullable(UInt16)",
+                      "Nullable(UInt32)",
+                      "Nullable(UInt64)",
+                      "Nullable(Int8)",
+                      "Nullable(Int16)",
+                      "Nullable(Int32)",
+                      "Nullable(Int64)"
+                  ]
+              )
+            end
+
+            it 'should parse as Integer' do
+              assert_equal [[0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]],
+                           @result_set.to_a
+            end
+          end
+
+          describe 'Nullable Float' do
+            before do
+              @result_set = Clickhouse::Connection::Query::ResultSet.new(
+                  [
+                      [nil, nil],
+                      [1, 1]
+                  ],
+                  [
+                      "column_nullable_float64",
+                      "column_nullable_float32"
+                  ],
+                  [
+                      "Nullable(Float64)",
+                      "Nullable(Float32)"
+                  ]
+              )
+            end
+
+            it 'should parse as Float' do
+              assert_equal ["0.0", "0.0", "1.0", "1.0"],
+                           @result_set.flatten.map(&:inspect)
+            end
+          end
+
+          describe 'Nullable String' do
+            before do
+              @result_set = Clickhouse::Connection::Query::ResultSet.new(
+                  [
+                      [nil, nil],
+                      ['', ''],
+                      ['text', 'T']
+                  ],
+                  [
+                      "column_nullable_string",
+                      "column_fixed_string_1"
+                  ],
+                  [
+                      "Nullable(String)",
+                      "Nullable(FixedString(1))"
+                  ]
+              )
+            end
+
+            it 'should parse as String' do
+              assert_equal [["", ""], ["", ""], ["text", "T"]],
+                           @result_set.to_a
+            end
+          end
+
+          describe 'Nullable DateTime' do
+            before do
+              @result_set = Clickhouse::Connection::Query::ResultSet.new(
+                  [
+                      [nil, nil],
+                      ["2016-03-20", "2016-03-20 22:55:39"]
+                  ],
+                  [
+                      "column_nullable_date",
+                      "column_date_time"
+                  ],
+                  [
+                      "Nullable(Date)",
+                      "Nullable(DateTime)"
+                  ]
+              )
+            end
+
+            it 'should parse as Date/DateTime' do
+              assert_equal [[nil, nil], [Date.new(2016, 3, 20), Time.new(2016, 3, 20, 22, 55, 39)]],
+                           @result_set.to_a
+            end
+          end
         end
 
       end
