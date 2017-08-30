@@ -123,6 +123,13 @@ ENGINE = MergeTree(date, 8192)
           end
         end
 
+        describe "#exists_table" do
+          it "sends a POST request containing a 'EXISTS TABLE' statement" do
+            @connection.expects(:post).with("EXISTS TABLE logs", nil).returns("1")
+            assert_equal true, @connection.exists_table("logs")
+          end
+        end
+
         describe "#insert_rows" do
           before do
             @csv = <<-CSV

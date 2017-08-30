@@ -44,6 +44,10 @@ module Clickhouse
         execute("DROP TABLE #{name}")
       end
 
+      def exists_table(name)
+        execute("EXISTS TABLE #{name}").strip == '1'
+      end
+
       def insert_rows(table, options = {})
         options[:csv] ||= begin
           options[:rows] ||= yield([])
