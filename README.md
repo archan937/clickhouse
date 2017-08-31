@@ -100,6 +100,13 @@ Clickhouse.connection.query "DESCRIBE TABLE events" # or Clickhouse.connection.d
  @types=["String", "String", "String", "String"]>
 ```
 
+Check if table exists.
+
+```ruby
+Clickhouse.connection.exists_table("events")
+=> true
+```
+
 Insert data.
 
 ```ruby
