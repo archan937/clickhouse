@@ -5,6 +5,7 @@ module Clickhouse
 
         def initialize(name)
           @name = name
+          @if_not_exists = false
           @columns = []
           yield self
         end
@@ -13,12 +14,20 @@ module Clickhouse
           @engine = value
         end
 
+        def if_not_exists(value = true)
+          @if_not_exists = value
+        end
+
         def to_sql
           raise Clickhouse::InvalidQueryError, "Missing table engine" unless @engine
           length = @columns.collect{|x| x[0].to_s.size}.max
 
           sql = []
-          sql << "CREATE TABLE #{@name} ("
+          if @if_not_exists
+            sql << "CREATE TABLE IF NOT EXISTS #{@name} ("
+          else
+            sql << "CREATE TABLE #{@name} ("
+          end
 
           @columns.each_with_index do |(name, type), index|
             sql << "  #{name.ljust(length, " ")} #{type}#{"," unless index == @columns.size - 1}"
