@@ -39,6 +39,8 @@ module Unit
 
         describe "when connection fails" do
           it "removes invalid connections from the pond" do
+            Clickhouse::Connection.any_instance.stubs(:ping!).raises(Faraday::Error)
+
             cluster = Clickhouse::Cluster.new :urls => %w(http://localhost:1234 http://localhost:1235 http://localhost:1236)
 
             assert_equal %w(
