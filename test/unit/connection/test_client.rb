@@ -116,6 +116,16 @@ module Unit
             end
           end
 
+          describe "when getting Faraday::Timeout" do
+            it "raises a Clickhouse::RequestTimedOut" do
+              @connection.instance_variable_set :@client, (client = mock)
+              client.expects(:get).raises(Faraday::TimeoutError.new("Request timed out"))
+              assert_raises Clickhouse::RequestTimedOut do
+                @connection.send(:request, :get, "SELECT 1")
+              end
+            end
+          end
+
           it "parses the body" do
             json = <<-JSON
               {"meta": []}
