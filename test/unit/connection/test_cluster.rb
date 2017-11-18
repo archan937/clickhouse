@@ -74,6 +74,16 @@ module Unit
             ), cluster.pond.available.collect(&:url)
           end
         end
+
+        describe "when timeout error gets raised while running the query" do
+          it "does not repeat request more then cluster's size times" do
+            Clickhouse::Connection.any_instance.expects(:ping!).at_least_once
+            Clickhouse::Connection.any_instance.stubs(:get).at_most(3).raises(Clickhouse::RequestTimedOut)
+
+            cluster = Clickhouse::Cluster.new :urls => %w(http://localhost:1234 http://localhost:1235 http://localhost:1236)
+            cluster.get "SELECT 1"
+          end
+        end
       end
 
     end
