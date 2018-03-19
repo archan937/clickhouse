@@ -63,6 +63,8 @@ module Clickhouse
               parse_date_time_value value
             when /Array\(/
               parse_array_value value
+            when /Enum8\(/
+              parse_enum8_value value
             else
               raise NotImplementedError, "Cannot parse value of type #{type.inspect}"
             end
@@ -94,6 +96,10 @@ module Clickhouse
         end
 
         def parse_array_value(value)
+          value
+        end
+
+        def parse_enum8_value(value)
           value
         end
 
