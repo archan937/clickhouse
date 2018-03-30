@@ -112,7 +112,7 @@ module Clickhouse
       end
 
       def to_select_options(options)
-        keys = [:select, :from, :where, :group, :having, :order, :limit, :offset]
+        keys = [:select, :from, :where, :prewhere, :group, :having, :order, :limit, :offset]
 
         options = Hash[keys.zip(options.values_at(*keys))]
         options[:select] ||= "*"
@@ -127,7 +127,7 @@ module Clickhouse
         case type
         when :select
           [value].flatten.join(", ")
-        when :where, :having
+        when :prewhere, :where, :having
           value.is_a?(Hash) ? to_condition_statements(value) : value
         else
           value
