@@ -112,7 +112,7 @@ module Clickhouse
       end
 
       def to_select_options(options)
-        keys = [:select, :from, :where, :prewhere, :group, :having, :order, :limit, :offset]
+        keys = [:select, :from, :prewhere, :where, :group, :having, :order, :limit, :offset]
 
         options = Hash[keys.zip(options.values_at(*keys))]
         options[:select] ||= "*"
