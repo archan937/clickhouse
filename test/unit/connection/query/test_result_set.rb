@@ -17,6 +17,7 @@ module Unit
                   "d91d1c90\u0000\u0000\u0000",
                   "2016-03-20",
                   "2016-03-20 23:49:11",
+                  "2017-02-30 01:00:00Z",
                   [4, 2, 5, 7]
                 ], [
                   "12948140",
@@ -25,6 +26,7 @@ module Unit
                   "d91d217c\u0000\u0000",
                   "2016-03-20",
                   "2016-03-20 23:58:34",
+                  "2017-02-30 01:00:00Z",
                   [6, 2, 9, 8, 1]
                 ], [
                   "319384",
@@ -33,6 +35,7 @@ module Unit
                   "d91d2294\u0000\u0000\u0000",
                   "2016-03-20",
                   "2016-03-20 22:55:39",
+                  "2017-02-30 01:00:00Z",
                   [3, 1, 2]
                 ]
               ],
@@ -43,6 +46,7 @@ module Unit
                 id
                 date
                 MAX(time)
+                MAX(time_utc)
                 groupUniqArray(code)
               ),
               %w(
@@ -52,6 +56,7 @@ module Unit
                 FixedString(16)
                 Date
                 DateTime
+                DateTime('UTC')
                 Array(8)
               )
             )
@@ -86,6 +91,7 @@ module Unit
                 "d91d1c90",
                 Date.new(2016, 3, 20),
                 Time.new(2016, 3, 20, 23, 49, 11),
+                Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                 [4, 2, 5, 7]
               ], @result_set.first
             end
@@ -100,6 +106,7 @@ module Unit
                 "d91d2294",
                 Date.new(2016, 3, 20),
                 Time.new(2016, 3, 20, 22, 55, 39),
+                Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                 [3, 1, 2]
               ], @result_set.last
             end
@@ -114,6 +121,7 @@ module Unit
                 "d91d1c90",
                 Date.new(2016, 3, 20),
                 Time.new(2016, 3, 20, 23, 49, 11),
+                Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                 4,
                 2,
                 5,
@@ -124,6 +132,7 @@ module Unit
                 "d91d217c",
                 Date.new(2016, 3, 20),
                 Time.new(2016, 3, 20, 23, 58, 34),
+                Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                 6,
                 2,
                 9,
@@ -135,6 +144,7 @@ module Unit
                 "d91d2294",
                 Date.new(2016, 3, 20),
                 Time.new(2016, 3, 20, 22, 55, 39),
+                Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                 3,
                 1,
                 2
@@ -152,6 +162,7 @@ module Unit
                   "id" => "d91d1c90",
                   "date" => Date.new(2016, 3, 20),
                   "MAX(time)" => Time.new(2016, 3, 20, 23, 49, 11),
+                  "MAX(time_utc)" => Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                   "groupUniqArray(code)" => [4, 2, 5, 7]
                 }, {
                   "SUM(clicks)" => 12948140,
@@ -160,6 +171,7 @@ module Unit
                   "id" => "d91d217c",
                   "date" => Date.new(2016, 3, 20),
                   "MAX(time)" => Time.new(2016, 3, 20, 23, 58, 34),
+                  "MAX(time_utc)" => Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                   "groupUniqArray(code)" => [6, 2, 9, 8, 1]
                 }, {
                   "SUM(clicks)" => 319384,
@@ -168,6 +180,7 @@ module Unit
                   "id" => "d91d2294",
                   "date" => Date.new(2016, 3, 20),
                   "MAX(time)" => Time.new(2016, 3, 20, 22, 55, 39),
+                  "MAX(time_utc)" => Time.new(2017, 2, 30, 01, 00, 00, "+00:00"),
                   "groupUniqArray(code)" => [3, 1, 2]
                 }
               ], @result_set.to_hashes

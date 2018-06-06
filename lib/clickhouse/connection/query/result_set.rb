@@ -61,6 +61,8 @@ module Clickhouse
               parse_date_value value
             when "DateTime"
               parse_date_time_value value
+            when "DateTime('UTC')"
+              parse_date_time_value value
             when /Array\(/
               parse_array_value value
             else
