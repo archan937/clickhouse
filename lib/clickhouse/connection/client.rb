@@ -9,7 +9,7 @@ module Clickhouse
 
       def ping!
         ensure_authentication
-        status = client.get("/").status
+        status = client.post("/", 'SELECT 1 = 1').status
         if status != 200
           raise ConnectionError, "Unexpected response status: #{status}"
         end
