@@ -77,12 +77,21 @@ module Unit
           end
         end
 
-        describe "#replicas_status" do
-          it "sends a REPLICAS STATUS request the server" do
-            @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:replicas_status).with("/?query=foo&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => ""))
-            @connection.stubs(:log)
-            @connection.replicas_status("foo")
+        describe "#replicas_status!" do
+          describe "when receiving 200" do
+            it "returns true" do
+              Faraday::Connection.any_instance.expects(:get).returns(stub(:status => 200))
+              assert_equal true, @connection.replicas_status!
+            end
+          end
+
+          describe "when receiving 500" do
+            it "raises a Clickhouse::ConnectionError" do
+              Faraday::Connection.any_instance.expects(:get).returns(stub(:status => 500))
+              assert_raises Clickhouse::ConnectionError do
+                @connection.replicas_status!
+              end
+            end
           end
         end
 
