@@ -34,6 +34,17 @@ module Clickhouse
         "#{@config[:scheme]}://#{@config[:host]}:#{@config[:port]}"
       end
 
+      def replicas_status!
+        ensure_authentication
+        status = client.get("/replicas_status").status
+        if status != 200
+          raise ConnectionError, "Unexpected response status: #{status}"
+        end
+        true
+      rescue Faraday::Error => e
+        raise ConnectionError, e.message
+      end
+
     private
 
       def client

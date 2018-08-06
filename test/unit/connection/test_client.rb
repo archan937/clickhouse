@@ -77,6 +77,15 @@ module Unit
           end
         end
 
+        describe "#replicas_status" do
+          it "sends a REPLICAS STATUS request the server" do
+            @connection.instance_variable_set :@client, (client = mock)
+            client.expects(:replicas_status).with("/?query=foo&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => ""))
+            @connection.stubs(:log)
+            @connection.replicas_status("foo")
+          end
+        end
+
         describe "#request" do
           before do
             @connection.stubs(:log)
