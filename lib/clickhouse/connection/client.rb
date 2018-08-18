@@ -49,6 +49,7 @@ module Clickhouse
         params = @config.select{|k, _v| k == :database}
         params[:query] = query
         params[:output_format_write_statistics] = 1
+        params[:session_id] = @session_id if @session_id
         query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
 
         "/?#{query_string}"
