@@ -1,5 +1,9 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.11 (September 10, 2018)
+
+* Added the ability to pass query restriction parameters
+
 ### Version 0.1.10 (January 13, 2017)
 
 * Fixed `erubis` dependency once and for all

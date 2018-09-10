@@ -47,6 +47,7 @@ module Clickhouse
 
       def path(query)
         params = @config.select{|k, _v| k == :database}
+        params.merge!(@config[:query_settings]) if @config[:query_settings]
         params[:query] = query
         params[:output_format_write_statistics] = 1
         query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
