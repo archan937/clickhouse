@@ -3,5 +3,5 @@ module Clickhouse
   MINOR = 1
   TINY  = 10
 
-  VERSION = [MAJOR, MINOR, TINY].join(".") + '-sessionId-to'
+  VERSION = [MAJOR, MINOR, TINY].join(".") + '-sessionId-to-2'
 end
