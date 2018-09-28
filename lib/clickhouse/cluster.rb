@@ -5,11 +5,10 @@ module Clickhouse
 
     def initialize(config)
       config = config.dup
-
       @use_session = config[:use_session]
-
       urls = config.delete(:urls) || config.delete("urls")
       urls.collect!{|url| ::Clickhouse::Utils.normalize_url(url)}
+      urls.shuffle! if use_session
 
       @pond = ::Pond.new :maximum_size => urls.size, :timeout => 5.0
       block = ::Proc.new do
@@ -41,10 +40,10 @@ module Clickhouse
       end
 
       pond.checkout do |connection|
-        connection.send(*args, &block)
+        checked = connection.send(*args, &block)
         @session_connection = connection if use_session
+        checked
       end
-
     rescue ::Clickhouse::ConnectionError
       @session_connection = nil
       retry if pond.available.any?
