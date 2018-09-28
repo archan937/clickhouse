@@ -35,7 +35,10 @@ module Clickhouse
   private
 
     def method_missing(*args, &block)
-      return session_connection.send(*args, &block) if session_connection
+
+      if session_connection
+        return session_connection.send(*args, &block)
+      end
 
       pond.checkout do |connection|
         connection.send(*args, &block)
