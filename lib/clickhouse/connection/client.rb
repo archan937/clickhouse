@@ -37,7 +37,11 @@ module Clickhouse
     private
 
       def client
-        @client ||= Faraday.new(:url => url)
+        @client ||= Faraday.new(:url => url, 
+                                :ssl => {
+                                  :ca_file => @config[:ca_file]
+                                }
+        )
       end
 
       def ensure_authentication
