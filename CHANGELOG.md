@@ -3,6 +3,7 @@
 ### Version 0.1.10lbl (May 30, 2019)
 
 * add logging and ability to specify ca_file for SSL self-signed cert trust
+* Use JSONEachRow format to insert - handles NULL better
 
 ### Version 0.1.10 (January 13, 2017)
 
