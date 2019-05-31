@@ -49,15 +49,15 @@ module Clickhouse
       end
 
       def insert_rows(table, options = {})
-        options[:csv] ||= begin
-          options[:rows] ||= yield([])
-          generate_csv options[:rows], options[:names]
-        end
+        # options[:csv] ||= begin
+        #   options[:rows] ||= yield([])
+        #   generate_csv options[:rows], options[:names]
+        # end
         # log :debug, "INSERT INTO #{table} FORMAT CSVWithNames #{options[:csv]}"
         # execute("INSERT INTO #{table} FORMAT CSVWithNames", options[:csv])
         options[:jsonrows] ||= begin
-          options[:jsonrows] ||= yield([])
-          generate_JSONrows options[:rows]
+          options[:rows] ||= yield([])
+          generate_JSONrows options[:rows], options[:names]
         end
         # log :debug, "INSERT INTO #{table} FORMAT CSVWithNames #{options[:jsonrows]}"
         execute("INSERT INTO #{table} FORMAT JSONEachRow", options[:jsonrows])
@@ -114,10 +114,12 @@ module Clickhouse
         end
       end
 
-      def generate_JSONrows(rows)
+      def generate_JSONrows(rows, names = nil)
+        hashes = rows[0].is_a?(Hash)
+
         rows.map do |row|
-          JSON.generate(row)
-        end
+          hashes ? JSON.generate(row) : JSON.generate(Hash[names.zip(row)])
+        end.join("\n")
       end
 
       def inspect_value(value)
