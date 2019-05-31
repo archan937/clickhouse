@@ -1,5 +1,9 @@
 ## Clickhouse CHANGELOG
 
+### Version 0.1.10lbl (May 30, 2019)
+
+* add logging and ability to specify ca_file for SSL self-signed cert trust
+
 ### Version 0.1.10 (January 13, 2017)
 
 * Fixed `erubis` dependency once and for all
