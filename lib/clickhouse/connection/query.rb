@@ -53,7 +53,7 @@ module Clickhouse
           options[:rows] ||= yield([])
           generate_csv options[:rows], options[:names]
         end
-        log.debug "INSERT INTO #{table} FORMAT CSVWithNames #{options[:csv]}"
+        log :debug, "INSERT INTO #{table} FORMAT CSVWithNames #{options[:csv]}"
         execute("INSERT INTO #{table} FORMAT CSVWithNames", options[:csv])
       end
 
