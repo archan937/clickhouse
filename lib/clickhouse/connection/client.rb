@@ -50,6 +50,7 @@ module Clickhouse
         params[:query] = query
         params[:output_format_write_statistics] = 1
         params[:session_id] = @session_id if @session_id
+        params[:session_timeout] = @config[:session_timeout] if @config[:session_timeout]
         query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
 
         "/?#{query_string}"
