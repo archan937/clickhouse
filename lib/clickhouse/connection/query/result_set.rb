@@ -53,7 +53,9 @@ module Clickhouse
               parse_int_value value
             when "Float32", "Float64"
               parse_float_value value
-            when "String", "Enum8", "Enum16"
+            when /^Decimal/
+              parse_decimal_value value
+            when "String", "Enum8", "Enum16", "LowCardinality(String)"
               parse_string_value value
             when /FixedString\(\d+\)/
               parse_fixed_string_value value
@@ -75,6 +77,10 @@ module Clickhouse
 
         def parse_float_value(value)
           value.to_f
+        end
+
+        def parse_decimal_value(value)
+          value.to_d
         end
 
         def parse_string_value(value)
