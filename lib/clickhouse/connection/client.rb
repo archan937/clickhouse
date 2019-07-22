@@ -37,7 +37,14 @@ module Clickhouse
     private
 
       def client
-        @client ||= Faraday.new(:url => url, request: @config.slice(:open_timeout, :timeout))
+        @client ||= connect_faraday
+      end
+
+      def connect_faraday
+        Faraday.new(url: url, request: @config.slice(:open_timeout, :write_timeout, :timeout)) do |conn|
+               conn.request(:retry, max: 0)
+               conn.adapter(:net_http)
+        end
       end
 
       def ensure_authentication
@@ -49,9 +56,9 @@ module Clickhouse
         params = @config.select{|k, _v| k == :database}
         params[:query] = query
         params[:output_format_write_statistics] = 1
-        params[:session_id] = @session_id if @session_id
-        params[:session_timeout] = @config[:session_timeout] if @config[:session_timeout]
-        query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
+        params[:session_id] = @session_id
+        params[:session_timeout] = @config[:session_timeout]
+        query_string = params.compact.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
 
         "/?#{query_string}"
       end
