@@ -92,11 +92,19 @@ module Clickhouse
         end
 
         def parse_date_value(value)
-          Date.parse(value)
+          if '0000-00-00'==value
+            nil
+          else
+            Date.parse(value)
+          end
         end
 
         def parse_date_time_value(value)
-          Time.parse(value)
+          if '0000-00-00 00:00:00'==value
+            nil
+          else
+            Time.parse(value)
+          end
         end
 
         def parse_array_value(value)
