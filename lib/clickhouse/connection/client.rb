@@ -71,7 +71,7 @@ module Clickhouse
         response = client.send(method, path(query), body)
         status = response.status
         duration = Time.now - start
-        query, format = Utils.extract_format(query)
+        query, format = Utils.extract_format("#{query} #{body}")
         response = parse_body(format, response.body)
         stats = parse_stats(response)
 
