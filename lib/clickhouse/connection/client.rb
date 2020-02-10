@@ -76,7 +76,11 @@ module Clickhouse
         stats = parse_stats(response)
 
         write_log duration, query, stats
-        raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
+
+        if status!=200
+          raise QueryError, "#{response}, status returned #{status} (expected 200)"
+        end
+
         response
 
       rescue Faraday::Error => e

@@ -34,20 +34,34 @@ module Clickhouse
   private
 
     def method_missing(*args, &block)
-
-      if session_connection
-        return session_connection.send(*args, &block)
-      end
-
-      pond.checkout do |connection|
-        checked = connection.send(*args, &block)
-        @session_connection = connection if use_session
-        checked
-      end
-    rescue ::Clickhouse::ConnectionError
-      @session_connection = nil
-      retry if pond.available.any?
+      use_session ? call_in_session(*args,&block) : call_with_retry(*args,&block)
     end
+
+    def call_in_session *args, &block
+
+      if @session_connection
+        @session_connection.send(*args, &block)
+      else
+        pond.checkout do |connection|
+          checked = connection.send(*args, &block)
+          @session_connection = connection
+          checked
+        end
+      end
+
+    end
+
+    def call_with_retry *args, &block
+      begin
+        pond.checkout do |connection|
+          connection.send(*args, &block)
+        end
+      rescue ::Clickhouse::ConnectionError
+        retry if pond.available.any?
+      end
+    end
+
+
 
   end
 end
