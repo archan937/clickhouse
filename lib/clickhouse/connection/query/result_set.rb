@@ -61,7 +61,7 @@ module Clickhouse
               parse_fixed_string_value value
             when "Date"
               parse_date_value value
-            when "DateTime"
+            when /^DateTime/
               parse_date_time_value value
             when /Array\(/
               parse_array_value value
