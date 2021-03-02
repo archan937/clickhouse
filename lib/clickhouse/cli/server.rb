@@ -1,5 +1,6 @@
 require "sinatra"
 require "erubis"
+require "readline"
 
 module Clickhouse
   class CLI < Thor
