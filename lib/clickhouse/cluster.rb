@@ -32,12 +32,15 @@ module Clickhouse
   private
 
     def method_missing(*args, &block)
-      pond.checkout do |connection|
-        connection.send(*args, &block)
+      trys_left = pond.available.count
+      begin
+        pond.checkout do |connection|
+          trys_left -= 1
+          connection.send(*args, &block)
+        end
+      rescue ::Clickhouse::ConnectionError
+        retry if pond.available.any? && trys_left.positive?
       end
-    rescue ::Clickhouse::ConnectionError
-      retry if pond.available.any?
     end
-
   end
 end

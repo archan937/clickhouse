@@ -9,6 +9,10 @@ module Clickhouse
   class InvalidConnectionError < ConnectionError
   end
 
+  # Occures when waiting too long for query response
+  class RequestTimedOut < ConnectionError
+  end
+
   class QueryError < Error
   end
 

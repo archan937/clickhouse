@@ -70,6 +70,8 @@ module Clickhouse
         raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
         response
 
+      rescue Faraday::TimeoutError => e
+        raise RequestTimedOut, e.message
       rescue Faraday::Error => e
         raise ConnectionError, e.message
       end
