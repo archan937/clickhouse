@@ -53,13 +53,15 @@ module Clickhouse
               parse_int_value value
             when "Float32", "Float64"
               parse_float_value value
-            when "String", "Enum8", "Enum16"
+            when /^Decimal/
+              parse_decimal_value value
+            when "String", "Enum8", "Enum16", "LowCardinality(String)"
               parse_string_value value
             when /FixedString\(\d+\)/
               parse_fixed_string_value value
             when "Date"
               parse_date_value value
-            when "DateTime"
+            when /^DateTime/
               parse_date_time_value value
             when /Array\(/
               parse_array_value value
@@ -77,6 +79,10 @@ module Clickhouse
           value.to_f
         end
 
+        def parse_decimal_value(value)
+          value.to_d
+        end
+
         def parse_string_value(value)
           value.force_encoding("UTF-8")
         end
@@ -86,11 +92,19 @@ module Clickhouse
         end
 
         def parse_date_value(value)
-          Date.parse(value)
+          if '0000-00-00'==value
+            nil
+          else
+            Date.parse(value)
+          end
         end
 
         def parse_date_time_value(value)
-          Time.parse(value)
+          if '0000-00-00 00:00:00'==value
+            nil
+          else
+            Time.parse(value)
+          end
         end
 
         def parse_array_value(value)

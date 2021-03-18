@@ -37,7 +37,14 @@ module Clickhouse
     private
 
       def client
-        @client ||= Faraday.new(:url => url)
+        @client ||= connect_faraday
+      end
+
+      def connect_faraday
+        Faraday.new(url: url, request: @config.slice(:open_timeout, :write_timeout, :timeout)) do |conn|
+               conn.request(:retry, max: 0)
+               conn.adapter(:net_http)
+        end
       end
 
       def ensure_authentication
@@ -49,7 +56,9 @@ module Clickhouse
         params = @config.select{|k, _v| k == :database}
         params[:query] = query
         params[:output_format_write_statistics] = 1
-        query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
+        params[:session_id] = @session_id
+        params[:session_timeout] = @config[:session_timeout]
+        query_string = params.compact.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
 
         "/?#{query_string}"
       end
@@ -62,12 +71,16 @@ module Clickhouse
         response = client.send(method, path(query), body)
         status = response.status
         duration = Time.now - start
-        query, format = Utils.extract_format(query)
+        query, format = Utils.extract_format("#{query} #{body}")
         response = parse_body(format, response.body)
         stats = parse_stats(response)
 
         write_log duration, query, stats
-        raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
+
+        if status!=200
+          raise QueryError, "#{response}, status returned #{status} (expected 200)"
+        end
+
         response
 
       rescue Faraday::Error => e

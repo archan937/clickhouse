@@ -17,6 +17,7 @@ module Clickhouse
 
     def initialize(config = {})
       @config = normalize_config(config)
+      @session_id = generate_session_id if @config[:use_session]
     end
 
   private
@@ -36,6 +37,12 @@ module Clickhouse
       end
 
       DEFAULT_CONFIG.merge(config.reject{|_k, v| v.nil?})
+    end
+
+    SESSIONID_LETTERS = (48..57).collect{|c| c.chr} + (65..90).collect{|c| c.chr} + (97..122).collect{|c| c.chr}
+
+    def generate_session_id
+      Array.new(20) { SESSIONID_LETTERS[rand(SESSIONID_LETTERS.size)] }.join
     end
 
   end
