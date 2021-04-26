@@ -107,6 +107,18 @@ Clickhouse.connection.exists_table("events")
 => true
 ```
 
+You can even check table existance upon creation.
+
+```ruby
+Clickhouse.connection.create_table("events") do |t|
+  t.if_not_exists
+  t.fixed_string :id, 16
+  t.uint16       :year
+  t.date         :date
+  t.date_time    :time
+  t.string       :event
+```
+
 Insert data.
 
 ```ruby
