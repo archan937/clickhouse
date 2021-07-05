@@ -49,11 +49,11 @@ module Clickhouse
       end
 
       def insert_rows(table, options = {})
-        options[:csv] ||= begin
+        options[:jsonrows] ||= begin
           options[:rows] ||= yield([])
-          generate_csv options[:rows], options[:names]
+          generate_JSONrows options[:rows], options[:names]
         end
-        execute("INSERT INTO #{table} FORMAT CSVWithNames", options[:csv])
+        execute("INSERT INTO #{table} FORMAT JSONEachRow", options[:jsonrows])
       end
 
       def select_rows(options)
@@ -92,19 +92,12 @@ module Clickhouse
 
     private
 
-      def generate_csv(rows, names = nil)
+      def generate_JSONrows(rows, names = nil)
         hashes = rows[0].is_a?(Hash)
 
-        if hashes
-          names ||= rows[0].keys
-        end
-
-        CSV.generate do |csv|
-          csv << names if names
-          rows.each do |row|
-            csv << (hashes ? row.values_at(*names) : row)
-          end
-        end
+        rows.map do |row|
+          hashes ? JSON.generate(row) : JSON.generate(Hash[names.zip(row)])
+        end.join("\n")
       end
 
       def inspect_value(value)
