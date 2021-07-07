@@ -110,7 +110,7 @@ Clickhouse.connection.exists_table("events")
 Insert data.
 
 ```ruby
-Clickhouse.connection.insert_rows(events, :names => %w(id year date time event user_id revenue)) do |rows|
+Clickhouse.connection.insert_rows(:events, :names => %w(id year date time event user_id revenue)) do |rows|
   rows << [
     "d91d1c90",
     2016,
