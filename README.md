@@ -57,6 +57,21 @@ Clickhouse.establish_connection
 => true
 ```
 
+Establish the connection with the ClickHouse server using custom config
+
+```ruby
+config = {
+  url: 'url',
+  username: 'username',
+  password: 'password',
+  query_settings: {
+    timeout_overflow_mode: 'throw',
+    max_execution_time: 5
+  }
+}
+Clickhouse.connect(config)
+```
+
 List databases and tables.
 
 ```ruby
