@@ -53,7 +53,13 @@ module Clickhouse
           options[:rows] ||= yield([])
           generate_csv options[:rows], options[:names]
         end
-        execute("INSERT INTO #{table} FORMAT CSVWithNames", options[:csv])
+        columns =
+          if !options[:names].nil?
+            "(`#{options[:names].join('`, `')}`)"
+          else
+            ''
+          end
+        execute("INSERT INTO #{table} #{columns} FORMAT CSVWithNames", options[:csv])
       end
 
       def select_rows(options)
