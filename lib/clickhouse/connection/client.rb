@@ -36,8 +36,8 @@ module Clickhouse
 
     private
 
-      def client
-        @client ||= Faraday.new(:url => url)
+      def client(options = {})
+        @client ||= Faraday.new(:url => url, :options => options)
       end
 
       def ensure_authentication
